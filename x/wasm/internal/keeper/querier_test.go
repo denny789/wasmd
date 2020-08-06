@@ -51,7 +51,7 @@ func TestQueryContractState(t *testing.T) {
 	keeper.importContractState(ctx, addr, contractModel)
 
 	// this gets us full error, not redacted sdk.Error
-	q := NewQuerier(keeper)
+	q := NewLegacyQuerier(keeper)
 	specs := map[string]struct {
 		srcPath []string
 		srcReq  abci.RequestQuery
@@ -192,13 +192,13 @@ func TestListContractByCodeOrdering(t *testing.T) {
 	}
 
 	// query and check the results are properly sorted
-	q := NewQuerier(keeper)
+	q := NewLegacyQuerier(keeper)
 	query := []string{QueryListContractByCode, fmt.Sprintf("%d", codeID)}
 	data := abci.RequestQuery{}
 	res, err := q(ctx, query, data)
 	require.NoError(t, err)
 
-	var contracts []ContractInfoWithAddress
+	var contracts []types.ContractInfoWithAddress
 	err = json.Unmarshal(res, &contracts)
 	require.NoError(t, err)
 

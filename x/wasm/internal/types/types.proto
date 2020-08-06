@@ -71,17 +71,24 @@ message MsgWasmIBCCall {
     string source_channel = 2 [(gogoproto.moretags) = "yaml:\"source_channel\""];
 
     bytes sender = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-    bytes destContractAddr = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
 
     // Timeout height relative to the current block height.
     // The timeout is disabled when set to 0.
-    uint64 timeout_height = 5 [(gogoproto.moretags) = "yaml:\"timeout_height\""];
+    uint64 timeout_height = 4 [(gogoproto.moretags) = "yaml:\"timeout_height\""];
     // Timeout timestamp (in nanoseconds) relative to the current block timestamp.
     // The timeout is disabled when set to 0.
-    uint64 timeout_timestamp = 6 [(gogoproto.moretags) = "yaml:\"timeout_timestamp\""];
+    uint64 timeout_timestamp = 5 [(gogoproto.moretags) = "yaml:\"timeout_timestamp\""];
 
     // Msg is the message to the contract
-    bytes msg = 7 [(gogoproto.casttype) = "encoding/json.RawMessage"];
+    bytes msg = 6 [(gogoproto.casttype) = "encoding/json.RawMessage"];
+}
+
+// MsgIBCCloseChannel port and channel need to be owned by the contract
+message MsgIBCCloseChannel {
+    string port = 1 [(gogoproto.moretags) = "yaml:\"dest_port\""];
+    string channel = 2 [(gogoproto.moretags) = "yaml:\"deset_channel\""];
+
+    bytes sender = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
 }
 
 // CodeInfo is data for the uploaded contract WASM code
@@ -108,6 +115,7 @@ message ContractInfo {
     AbsoluteTxPosition created = 6;
     AbsoluteTxPosition last_updated = 7;
     uint64 previous_code_id = 8 [(gogoproto.customname) = "PreviousCodeID"];
+    string ibc_port_id = 9 [(gogoproto.customname) = "IBCPortID"];
 }
 
 // AbsoluteTxPosition can be used to sort contracts
@@ -117,24 +125,11 @@ message AbsoluteTxPosition {
     // TxIndex is a monotonic counter within the block (actual transaction index, or gas consumed)
     uint64 tx_index = 2;
 }
+
 // Model is a struct that holds a KV pair
 message Model {
     // hex-encode key to read it better (this is often ascii)
     bytes Key = 1 [(gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes"];
     // base64-encode raw value
     bytes Value = 2;
-}
-
-message WasmIBCContractPacketData {
-    // the sender address
-    bytes sender = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-    bytes destContractAddr = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-    bytes msg = 3 [(gogoproto.casttype) = "encoding/json.RawMessage"];
-}
-// WasmIBCContractPacketAcknowledgement
-message WasmIBCContractPacketAcknowledgement {
-    bool success = 1;
-    string error = 2;
-    // testdata
-    string label = 3;
 }
