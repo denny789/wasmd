@@ -67,6 +67,7 @@ var (
 	CreateTestInput           = keeper.CreateTestInput
 	TestHandler               = keeper.TestHandler
 	NewQuerier                = keeper.NewQuerier
+	ContractFromPortID        = keeper.ContractFromPortID
 
 	// variable aliases
 	ModuleCdc            = types.ModuleCdc
@@ -88,30 +89,33 @@ var (
 )
 
 type (
-	GenesisState            = types.GenesisState
-	Code                    = types.Code
-	Contract                = types.Contract
-	MsgStoreCode            = types.MsgStoreCode
-	MsgInstantiateContract  = types.MsgInstantiateContract
-	MsgExecuteContract      = types.MsgExecuteContract
-	MsgMigrateContract      = types.MsgMigrateContract
-	MsgUpdateAdmin          = types.MsgUpdateAdmin
-	MsgClearAdmin           = types.MsgClearAdmin
-	Model                   = types.Model
-	CodeInfo                = types.CodeInfo
-	ContractInfo            = types.ContractInfo
-	CreatedAt               = types.AbsoluteTxPosition
-	WasmConfig              = types.WasmConfig
-	ContractInfoWithAddress = types.ContractInfoWithAddress
-	CodeInfoResponse        = types.CodeInfoResponse
-	MessageHandler          = keeper.MessageHandler
-	BankEncoder             = keeper.BankEncoder
-	CustomEncoder           = keeper.CustomEncoder
-	StakingEncoder          = keeper.StakingEncoder
-	WasmEncoder             = keeper.WasmEncoder
-	MessageEncoders         = keeper.MessageEncoders
-	Keeper                  = keeper.Keeper
-	QueryHandler            = keeper.QueryHandler
-	CustomQuerier           = keeper.CustomQuerier
-	QueryPlugins            = keeper.QueryPlugins
+	GenesisState                         = types.GenesisState
+	Code                                 = types.Code
+	Contract                             = types.Contract
+	MsgStoreCode                         = types.MsgStoreCode
+	MsgInstantiateContract               = types.MsgInstantiateContract
+	MsgExecuteContract                   = types.MsgExecuteContract
+	MsgMigrateContract                   = types.MsgMigrateContract
+	MsgUpdateAdmin                       = types.MsgUpdateAdmin
+	MsgClearAdmin                        = types.MsgClearAdmin
+	MsgWasmIBCCall                       = types.MsgWasmIBCCall
+	WasmIBCContractPacketData            = types.WasmIBCContractPacketData
+	WasmIBCContractPacketAcknowledgement = types.WasmIBCContractPacketAcknowledgement
+	Model                                = types.Model
+	CodeInfo                             = types.CodeInfo
+	ContractInfo                         = types.ContractInfo
+	CreatedAt                            = types.AbsoluteTxPosition
+	WasmConfig                           = types.WasmConfig
+	ContractInfoWithAddress              = types.ContractInfoWithAddress
+	CodeInfoResponse                     = types.CodeInfoResponse
+	MessageHandler                       = keeper.MessageHandler
+	BankEncoder                          = keeper.BankEncoder
+	CustomEncoder                        = keeper.CustomEncoder
+	StakingEncoder                       = keeper.StakingEncoder
+	WasmEncoder                          = keeper.WasmEncoder
+	MessageEncoders                      = keeper.MessageEncoders
+	Keeper                               = keeper.Keeper
+	QueryHandler                         = keeper.QueryHandler
+	CustomQuerier                        = keeper.CustomQuerier
+	QueryPlugins                         = keeper.QueryPlugins
 )
