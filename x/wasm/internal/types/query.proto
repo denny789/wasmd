@@ -1,32 +1,30 @@
 syntax = "proto3";
 package wasmd.x.wasmd;
 
-option go_package = "github.com/CosmWasm/wasmd/x/wasmd/internal/types";
-
 import "gogoproto/gogo.proto";
 import "x/wasm/internal/types/types.proto";
 import "google/protobuf/empty.proto";
 
+option go_package = "github.com/CosmWasm/wasmd/x/wasmd/internal/types";
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.equal_all) = true;
+
+
 // Query provides defines the gRPC querier service
 service Query {
-
     rpc ContractInfo (QueryContractInfoRequest) returns (QueryContractInfoResponse) {
     }
-
     rpc ContractsByCode (QueryContractsByCodeRequest) returns (QueryContractsByCodeResponse) {
     }
-
-
     rpc AllContractState (QueryAllContractStateRequest) returns (QueryAllContractStateResponse) {
     }
     rpc RawContractState (QueryRawContractStateRequest) returns (QueryRawContractStateResponse) {
     }
     rpc SmartContractState (QuerySmartContractStateRequest) returns (QuerySmartContractStateResponse) {
     }
-
     rpc Code (QueryCodeRequest) returns (QueryCodeResponse) {
     }
-
     rpc Codes (google.protobuf.Empty) returns (QueryCodesResponse) {
     }
 }

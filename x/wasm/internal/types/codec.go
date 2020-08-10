@@ -5,6 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 // RegisterCodec registers the account types and interface
@@ -32,6 +33,14 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgMigrateContract{},
 		&MsgUpdateAdmin{},
 		&MsgClearAdmin{},
+	)
+	registry.RegisterImplementations(
+		(*govtypes.Content)(nil),
+		&StoreCodeProposal{},
+		&InstantiateContractProposal{},
+		&MigrateContractProposal{},
+		&UpdateAdminProposal{},
+		&ClearAdminProposal{},
 	)
 }
 

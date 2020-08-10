@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
@@ -16,6 +17,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
@@ -435,7 +438,7 @@ func TestImportContractWithCodeHistoryReset(t *testing.T) {
 		Source:   "https://example.com",
 		Builder:  "foo/bar:tag",
 		InstantiateConfig: wasmTypes.AccessConfig{
-			Type:    types.OnlyAddress,
+			Type:    types.AccessTypeOnlyAddress,
 			Address: codeCreatorAddr,
 		},
 	}
@@ -458,7 +461,7 @@ func TestImportContractWithCodeHistoryReset(t *testing.T) {
 	assert.Equal(t, expContractInfo, *gotContractInfo)
 
 	expHistory := []types.ContractCodeHistoryEntry{{
-		Operation: types.GenesisContractCodeHistoryType,
+		Operation: types.ContractCodeHistoryTypeGenesis,
 		CodeID:    1,
 		Updated:   types.NewAbsoluteTxPosition(ctx),
 	},
@@ -473,8 +476,8 @@ func setupKeeper(t *testing.T) (Keeper, sdk.Context, []sdk.StoreKey, func()) {
 	cleanup := func() { os.RemoveAll(tempDir) }
 	//t.Cleanup(cleanup) todo: add with Go 1.14
 	var (
-		keyParams  = sdk.NewKVStoreKey(params.StoreKey)
-		tkeyParams = sdk.NewTransientStoreKey(params.TStoreKey)
+		keyParams  = sdk.NewKVStoreKey(paramtypes.StoreKey)
+		tkeyParams = sdk.NewTransientStoreKey(paramtypes.TStoreKey)
 		keyWasm    = sdk.NewKVStoreKey(wasmTypes.StoreKey)
 	)
 
@@ -490,9 +493,9 @@ func setupKeeper(t *testing.T) (Keeper, sdk.Context, []sdk.StoreKey, func()) {
 		Time:   time.Date(2020, time.April, 22, 12, 0, 0, 0, time.UTC),
 	}, false, log.NewNopLogger())
 
-	pk := params.NewKeeper(cdc, keyParams, tkeyParams)
 	appCodec := MakeTestCodec()
 	wasmConfig := wasmTypes.DefaultWasmConfig()
+	pk := paramskeeper.NewKeeper(appCodec, keyParams, tkeyParams)
 
 	srcKeeper := NewKeeper(appCodec, keyWasm, pk.Subspace(wasmTypes.DefaultParamspace), authkeeper.AccountKeeper{}, nil, stakingkeeper.Keeper{}, nil, tempDir, wasmConfig, "", nil, nil)
 	srcKeeper.setParams(ctx, wasmTypes.DefaultParams())

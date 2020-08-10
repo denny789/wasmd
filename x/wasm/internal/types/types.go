@@ -47,33 +47,11 @@ func NewCodeInfo(codeHash []byte, creator sdk.AccAddress, source string, builder
 }
 
 
-type ContractCodeHistoryOperationType string
+var AllCodeHistoryTypes = []ContractCodeHistoryOperationType{ContractCodeHistoryTypeGenesis, ContractCodeHistoryTypeInit, ContractCodeHistoryTypeMigrate}
 
-const (
-	InitContractCodeHistoryType    ContractCodeHistoryOperationType = "Init"
-	MigrateContractCodeHistoryType ContractCodeHistoryOperationType = "Migrate"
-	GenesisContractCodeHistoryType ContractCodeHistoryOperationType = "Genesis"
-)
 
-var AllCodeHistoryTypes = []ContractCodeHistoryOperationType{InitContractCodeHistoryType, MigrateContractCodeHistoryType}
-
-// ContractCodeHistoryEntry stores code updates to a contract.
-type ContractCodeHistoryEntry struct {
-	Operation ContractCodeHistoryOperationType `json:"operation"`
-	CodeID    uint64                           `json:"code_id"`
-	Updated   *AbsoluteTxPosition              `json:"updated,omitempty"`
-	Msg       json.RawMessage                  `json:"msg,omitempty"`
-}
-
-// ContractInfo stores a WASM contract instance
-type ContractInfo struct {
-	CodeID  uint64         `json:"code_id"`
-	Creator sdk.AccAddress `json:"creator"`
-	Admin   sdk.AccAddress `json:"admin,omitempty"`
-	Label   string         `json:"label"`
-	// never show this in query results, just use for sorting
-	// (Note: when using json tag "-" amino refused to serialize it...)
-	Created *AbsoluteTxPosition `json:"created,omitempty"`
+func (c *ContractHistory) AppendCodeHistory(newEntries ...ContractCodeHistoryEntry){
+	c.CodeHistoryEntries = append(c.CodeHistoryEntries, newEntries...)
 }
 
 // NewContractInfo creates a new instance of a given WASM contract info
@@ -107,7 +85,7 @@ func (c *ContractInfo) ValidateBasic() error {
 
 func (c ContractInfo) InitialHistory(initMsg []byte) ContractCodeHistoryEntry {
 	return ContractCodeHistoryEntry{
-		Operation: InitContractCodeHistoryType,
+		Operation: ContractCodeHistoryTypeInit,
 		CodeID:    c.CodeID,
 		Updated:   c.Created,
 		Msg:       initMsg,
@@ -116,7 +94,7 @@ func (c ContractInfo) InitialHistory(initMsg []byte) ContractCodeHistoryEntry {
 
 func (c *ContractInfo) AddMigration(ctx sdk.Context, codeID uint64, msg []byte) ContractCodeHistoryEntry {
 	h := ContractCodeHistoryEntry{
-		Operation: MigrateContractCodeHistoryType,
+		Operation: ContractCodeHistoryTypeMigrate,
 		CodeID:    codeID,
 		Updated:   NewAbsoluteTxPosition(ctx),
 		Msg:       msg,
@@ -129,12 +107,11 @@ func (c *ContractInfo) AddMigration(ctx sdk.Context, codeID uint64, msg []byte) 
 func (c *ContractInfo) ResetFromGenesis(ctx sdk.Context) ContractCodeHistoryEntry {
 	c.Created = NewAbsoluteTxPosition(ctx)
 	return ContractCodeHistoryEntry{
-		Operation: GenesisContractCodeHistoryType,
+		Operation: ContractCodeHistoryTypeGenesis,
 		CodeID:    c.CodeID,
 		Updated:   c.Created,
 	}
 }
-
 
 // LessThan can be used to sort
 func (a *AbsoluteTxPosition) LessThan(b *AbsoluteTxPosition) bool {
@@ -201,11 +178,6 @@ func NewWasmCoins(cosmosCoins sdk.Coins) (wasmCoins []wasmTypes.Coin) {
 
 const CustomEventType = "wasm"
 const AttributeKeyContractAddr = "contract_address"
-
-// CosmosResult converts from a Wasm Result type
-func CosmosResult(wasmResult wasmTypes.HandleResponse, contractAddr sdk.AccAddress) ([]byte, sdk.Events) {
-	return wasmResult.Data, ParseEvents(wasmResult.Log, contractAddr)
-}
 
 // ParseEvents converts wasm type LogAttribute to cosmos sdk events
 func ParseEvents(log []wasmTypes.LogAttribute, contractAddr sdk.AccAddress) sdk.Events {

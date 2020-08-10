@@ -6,6 +6,7 @@ import (
 	"time"
 
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/internal/types"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/internal/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -28,6 +29,7 @@ import (
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/evidence"
 	"github.com/cosmos/cosmos-sdk/x/gov"
+	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	transfer "github.com/cosmos/cosmos-sdk/x/ibc-transfer"
@@ -38,6 +40,7 @@ import (
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
@@ -49,7 +52,6 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/internal/types"
 )
 
 const flagLRUCacheSize = "lru_size"
@@ -93,8 +95,7 @@ type TestKeepers struct {
 	WasmKeeper    Keeper
 	DistKeeper    distributionkeeper.Keeper
 	BankKeeper    bankkeeper.Keeper
-	SupplyKeeper  supply.Keeper
-	GovKeeper     gov.Keeper
+	GovKeeper     govkeeper.Keeper
 }
 
 // encoders can be nil to accept the defaults, or set it to override some of the message handlers (like default)
@@ -127,15 +128,15 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 	}, isCheckTx, log.NewNopLogger())
 	appCodec := MakeTestCodec()
 
-	pk := paramskeeper.NewKeeper(appCodec, keyParams, tkeyParams)
-	pk.Subspace(authtypes.ModuleName)
-	pk.Subspace(banktypes.ModuleName)
-	pk.Subspace(stakingtypes.ModuleName)
-	pk.Subspace(minttypes.ModuleName)
-	pk.Subspace(distributiontypes.ModuleName)
-	pk.Subspace(slashingtypes.ModuleName)
-	pk.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
-	pk.Subspace(crisistypes.ModuleName)
+	paramsKeeper := paramskeeper.NewKeeper(appCodec, keyParams, tkeyParams)
+	paramsKeeper.Subspace(authtypes.ModuleName)
+	paramsKeeper.Subspace(banktypes.ModuleName)
+	paramsKeeper.Subspace(stakingtypes.ModuleName)
+	paramsKeeper.Subspace(minttypes.ModuleName)
+	paramsKeeper.Subspace(distributiontypes.ModuleName)
+	paramsKeeper.Subspace(slashingtypes.ModuleName)
+	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
+	paramsKeeper.Subspace(crisistypes.ModuleName)
 
 	maccPerms := map[string][]string{ // module account permissions
 		authtypes.FeeCollectorName:     nil,
@@ -146,8 +147,8 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 		govtypes.ModuleName:            {authtypes.Burner},
 		transfertypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
 	}
-	authSubsp, _ := pk.GetSubspace(authtypes.ModuleName)
-	accountKeeper := authkeeper.NewAccountKeeper(
+	authSubsp, _ := paramsKeeper.GetSubspace(authtypes.ModuleName)
+	authKeeper := authkeeper.NewAccountKeeper(
 		appCodec,
 		keyAcc, // target store
 		authSubsp,
@@ -155,11 +156,11 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 		maccPerms,
 	)
 
-	bankSubsp, _ := pk.GetSubspace(banktypes.ModuleName)
+	bankSubsp, _ := paramsKeeper.GetSubspace(banktypes.ModuleName)
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		appCodec,
 		keyBank,
-		accountKeeper,
+		authKeeper,
 		bankSubsp,
 		nil,
 	)
@@ -167,12 +168,12 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 	bankParams = bankParams.SetSendEnabledParam("stake", true)
 	bankKeeper.SetParams(ctx, bankParams)
 
-	stakingSubsp, _ := pk.GetSubspace(stakingtypes.ModuleName)
-	stakingKeeper := stakingkeeper.NewKeeper(appCodec, keyStaking, accountKeeper, bankKeeper, stakingSubsp)
+	stakingSubsp, _ := paramsKeeper.GetSubspace(stakingtypes.ModuleName)
+	stakingKeeper := stakingkeeper.NewKeeper(appCodec, keyStaking, authKeeper, bankKeeper, stakingSubsp)
 	stakingKeeper.SetParams(ctx, TestingStakeParams)
 
-	distSubsp, _ := pk.GetSubspace(distributiontypes.ModuleName)
-	distKeeper := distributionkeeper.NewKeeper(appCodec, keyDistro, distSubsp, accountKeeper, bankKeeper, stakingKeeper, authtypes.FeeCollectorName, nil)
+	distSubsp, _ := paramsKeeper.GetSubspace(distributiontypes.ModuleName)
+	distKeeper := distributionkeeper.NewKeeper(appCodec, keyDistro, distSubsp, authKeeper, bankKeeper, stakingKeeper, authtypes.FeeCollectorName, nil)
 	distKeeper.SetParams(ctx, distributiontypes.DefaultParams())
 	stakingKeeper.SetHooks(distKeeper.Hooks())
 
@@ -186,7 +187,7 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 		sdk.NewCoin("stake", sdk.NewInt(2000000)),
 	))
 	require.NoError(t, err)
-	accountKeeper.SetModuleAccount(ctx, distrAcc)
+	authKeeper.SetModuleAccount(ctx, distrAcc)
 
 	router := baseapp.NewRouter()
 	bh := bank.NewHandler(bankKeeper)
@@ -199,20 +200,19 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 	// Load default wasm config
 	wasmConfig := wasmTypes.DefaultWasmConfig()
 
-	keeper := NewKeeper(appCodec, keyWasm, paramsKeeper.Subspace(wasmtypes.DefaultParamspace), accountKeeper, bankKeeper, stakingKeeper, router, tempDir, wasmConfig, supportedFeatures, encoders, queriers)
+	keeper := NewKeeper(appCodec, keyWasm, paramsKeeper.Subspace(wasmtypes.DefaultParamspace), authKeeper, bankKeeper, stakingKeeper, router, tempDir, wasmConfig, supportedFeatures, encoders, queriers)
 
 	// add wasm handler so we can loop-back (contracts calling contracts)
 	router.AddRoute(sdk.NewRoute(wasmTypes.RouterKey, TestHandler(keeper)))
-	// add wasm handler so we can loop-back (contracts calling contracts)
-	router.AddRoute(wasmtypes.RouterKey, TestHandler(keeper))
 
-	govRouter := gov.NewRouter().
-		AddRoute(params.RouterKey, params.NewParamChangeProposalHandler(paramsKeeper)).
+	govRouter := govtypes.NewRouter().
 		AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(paramsKeeper)).
+		AddRoute(distributiontypes.RouterKey, distribution.NewCommunityPoolSpendProposalHandler(distKeeper)).
 		AddRoute(wasmtypes.RouterKey, NewWasmProposalHandler(keeper, wasmtypes.EnableAllProposals))
 
-	govKeeper := gov.NewKeeper(
-		cdc, keyGov, paramsKeeper.Subspace(govtypes.DefaultParamspace).WithKeyTable(gov.ParamKeyTable()), supplyKeeper, stakingKeeper, govRouter,
+	govKeeper := govkeeper.NewKeeper(
+		appCodec, keyGov, paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable()), authKeeper, bankKeeper, stakingKeeper, govRouter,
 	)
 
 	govKeeper.SetProposalID(ctx, govtypes.DefaultStartingProposalID)
@@ -221,7 +221,7 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 	govKeeper.SetTallyParams(ctx, govtypes.DefaultTallyParams())
 
 	keepers := TestKeepers{
-		AccountKeeper: accountKeeper,
+		AccountKeeper: authKeeper,
 		StakingKeeper: stakingKeeper,
 		DistKeeper:    distKeeper,
 		WasmKeeper:    keeper,

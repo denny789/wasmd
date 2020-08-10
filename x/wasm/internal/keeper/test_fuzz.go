@@ -52,9 +52,9 @@ func FuzzStateModel(m *types.Model, c fuzz.Continue) {
 
 func FuzzAccessType(m *types.AccessType, c fuzz.Continue) {
 	pos := c.Int() % len(types.AllAccessTypes)
-	for k, _ := range types.AllAccessTypes {
+	for _, v := range types.AllAccessTypes {
 		if pos == 0 {
-			*m = k
+			*m = v
 			return
 		}
 		pos--

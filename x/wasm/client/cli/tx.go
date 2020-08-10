@@ -57,7 +57,7 @@ func StoreCodeCmd() *cobra.Command {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
 
-			msg, err := parseStoreCodeArgs(args, cliCtx)
+			msg, err := parseStoreCodeArgs(args, clientCtx)
 			if err != nil {
 				return err
 			}
@@ -99,7 +99,7 @@ func parseStoreCodeArgs(args []string, cliCtx client.Context) (types.MsgStoreCod
 		if err != nil {
 			return types.MsgStoreCode{}, sdkerrors.Wrap(err, flagInstantiateByAddress)
 		}
-		x := types.OnlyAddress.With(allowedAddr)
+		x := types.AccessTypeOnlyAddress.With(allowedAddr)
 		perm = &x
 	} else if everybody := viper.GetBool(flagInstantiateByEverybody); everybody {
 		perm = &types.AllowEverybody

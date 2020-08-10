@@ -14,6 +14,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -67,20 +68,20 @@ func TestCreateStoresInstantiatePermission(t *testing.T) {
 		expInstConf   types.AccessConfig
 	}{
 		"default": {
-			srcPermission: types.DefaultParams().DefaultInstantiatePermission,
+			srcPermission: types.DefaultParams().InstantiateDefaultPermission,
 			expInstConf:   types.AllowEverybody,
 		},
 		"everybody": {
-			srcPermission: types.Everybody,
+			srcPermission: types.AccessTypeEverybody,
 			expInstConf:   types.AllowEverybody,
 		},
 		"nobody": {
-			srcPermission: types.Nobody,
+			srcPermission: types.AccessTypeNobody,
 			expInstConf:   types.AllowNobody,
 		},
 		"onlyAddress with matching address": {
-			srcPermission: types.OnlyAddress,
-			expInstConf:   types.AccessConfig{Type: types.OnlyAddress, Address: myAddr},
+			srcPermission: types.AccessTypeOnlyAddress,
+			expInstConf:   types.AccessConfig{Type: types.AccessTypeOnlyAddress, Address: myAddr},
 		},
 	}
 	for msg, spec := range specs {
@@ -90,12 +91,12 @@ func TestCreateStoresInstantiatePermission(t *testing.T) {
 			defer os.RemoveAll(tempDir)
 
 			ctx, keepers := CreateTestInput(t, false, tempDir, SupportedFeatures, nil, nil)
-			accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
+			accKeeper, keeper, bankKeeper := keepers.AccountKeeper, keepers.WasmKeeper, keepers.BankKeeper
 			keeper.setParams(ctx, types.Params{
-				UploadAccess:                 types.AllowEverybody,
-				DefaultInstantiatePermission: spec.srcPermission,
+				CodeUploadAccess:             types.AllowEverybody,
+				InstantiateDefaultPermission: spec.srcPermission,
 			})
-			fundAccounts(ctx, accKeeper, myAddr, deposit)
+			fundAccounts(t, ctx, accKeeper, bankKeeper, myAddr, deposit)
 
 			codeID, err := keeper.Create(ctx, myAddr, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
 			require.NoError(t, err)
@@ -112,11 +113,11 @@ func TestCreateWithParamPermissions(t *testing.T) {
 	require.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 	ctx, keepers := CreateTestInput(t, false, tempDir, SupportedFeatures, nil, nil)
-	accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
+	accKeeper, bankKeeper, keeper := keepers.AccountKeeper, keepers.BankKeeper, keepers.WasmKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
-	creator := createFakeFundedAccount(ctx, accKeeper, deposit)
-	otherAddr := createFakeFundedAccount(ctx, accKeeper, deposit)
+	creator := createFakeFundedAccount(t, ctx, accKeeper, bankKeeper, deposit)
+	otherAddr := createFakeFundedAccount(t, ctx, accKeeper, bankKeeper, deposit)
 
 	wasmCode, err := ioutil.ReadFile("./testdata/contract.wasm")
 	require.NoError(t, err)
@@ -136,17 +137,17 @@ func TestCreateWithParamPermissions(t *testing.T) {
 			expError:      sdkerrors.ErrUnauthorized,
 		},
 		"onlyAddress with matching address": {
-			srcPermission: types.OnlyAddress.With(creator),
+			srcPermission: types.AccessTypeOnlyAddress.With(creator),
 		},
 		"onlyAddress with non matching address": {
-			srcPermission: types.OnlyAddress.With(otherAddr),
+			srcPermission: types.AccessTypeOnlyAddress.With(otherAddr),
 			expError:      sdkerrors.ErrUnauthorized,
 		},
 	}
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {
 			params := types.DefaultParams()
-			params.UploadAccess = spec.srcPermission
+			params.CodeUploadAccess = spec.srcPermission
 			keeper.setParams(ctx, params)
 			_, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
 			require.True(t, spec.expError.Is(err), err)
@@ -316,7 +317,7 @@ func TestInstantiate(t *testing.T) {
 	assert.Equal(t, info.Label, "demo contract 1")
 
 	exp := []types.ContractCodeHistoryEntry{{
-		Operation: types.InitContractCodeHistoryType,
+		Operation: types.ContractCodeHistoryTypeInit,
 		CodeID:    codeID,
 		Updated:   types.NewAbsoluteTxPosition(ctx),
 		Msg:       json.RawMessage(initMsgBz),
@@ -353,7 +354,7 @@ func TestInstantiateWithDeposit(t *testing.T) {
 			expError: true,
 		},
 		"blocked address": {
-			srcActor: supply.NewModuleAddress(auth.FeeCollectorName),
+			srcActor: authtypes.NewModuleAddress(authtypes.FeeCollectorName),
 			fundAddr: true,
 			expError: true,
 		},
@@ -364,10 +365,10 @@ func TestInstantiateWithDeposit(t *testing.T) {
 			require.NoError(t, err)
 			defer os.RemoveAll(tempDir)
 			ctx, keepers := CreateTestInput(t, false, tempDir, SupportedFeatures, nil, nil)
-			accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
+			accKeeper, bankKeeper, keeper := keepers.AccountKeeper, keepers.BankKeeper, keepers.WasmKeeper
 
 			if spec.fundAddr {
-				fundAccounts(ctx, accKeeper, spec.srcActor, sdk.NewCoins(sdk.NewInt64Coin("denom", 200)))
+				fundAccounts(t, ctx, accKeeper, bankKeeper, spec.srcActor, sdk.NewCoins(sdk.NewInt64Coin("denom", 200)))
 			}
 			contractID, err := keeper.Create(ctx, spec.srcActor, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "", nil)
 			require.NoError(t, err)
@@ -380,8 +381,8 @@ func TestInstantiateWithDeposit(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			contractAccount := accKeeper.GetAccount(ctx, addr)
-			assert.Equal(t, deposit, contractAccount.GetCoins())
+			balances := bankKeeper.GetAllBalances(ctx, addr)
+			assert.Equal(t, deposit, balances)
 		})
 	}
 }
@@ -423,11 +424,11 @@ func TestInstantiateWithPermissions(t *testing.T) {
 			expError:      sdkerrors.ErrUnauthorized,
 		},
 		"onlyAddress with matching address": {
-			srcPermission: types.OnlyAddress.With(myAddr),
+			srcPermission: types.AccessTypeOnlyAddress.With(myAddr),
 			srcActor:      myAddr,
 		},
 		"onlyAddress with non matching address": {
-			srcPermission: types.OnlyAddress.With(otherAddr),
+			srcPermission: types.AccessTypeOnlyAddress.With(otherAddr),
 			expError:      sdkerrors.ErrUnauthorized,
 		},
 	}
@@ -438,8 +439,8 @@ func TestInstantiateWithPermissions(t *testing.T) {
 			defer os.RemoveAll(tempDir)
 
 			ctx, keepers := CreateTestInput(t, false, tempDir, SupportedFeatures, nil, nil)
-			accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
-			fundAccounts(ctx, accKeeper, spec.srcActor, deposit)
+			accKeeper, bankKeeper, keeper := keepers.AccountKeeper, keepers.BankKeeper, keepers.WasmKeeper
+			fundAccounts(t, ctx, accKeeper, bankKeeper, spec.srcActor, deposit)
 
 			contractID, err := keeper.Create(ctx, myAddr, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "", &spec.srcPermission)
 			require.NoError(t, err)
@@ -557,7 +558,7 @@ func TestExecuteWithDeposit(t *testing.T) {
 	var (
 		bob         = bytes.Repeat([]byte{1}, sdk.AddrLen)
 		fred        = bytes.Repeat([]byte{2}, sdk.AddrLen)
-		blockedAddr = supply.NewModuleAddress(auth.FeeCollectorName)
+		blockedAddr = authtypes.NewModuleAddress(authtypes.FeeCollectorName)
 		deposit     = sdk.NewCoins(sdk.NewInt64Coin("denom", 100))
 	)
 
@@ -596,10 +597,10 @@ func TestExecuteWithDeposit(t *testing.T) {
 			require.NoError(t, err)
 			defer os.RemoveAll(tempDir)
 			ctx, keepers := CreateTestInput(t, false, tempDir, SupportedFeatures, nil, nil)
-			accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
+			accKeeper, bankKeeper, keeper := keepers.AccountKeeper, keepers.BankKeeper, keepers.WasmKeeper
 
 			if spec.fundAddr {
-				fundAccounts(ctx, accKeeper, spec.srcActor, sdk.NewCoins(sdk.NewInt64Coin("denom", 200)))
+				fundAccounts(t, ctx, accKeeper, bankKeeper, spec.srcActor, sdk.NewCoins(sdk.NewInt64Coin("denom", 200)))
 			}
 			codeID, err := keeper.Create(ctx, spec.srcActor, wasmCode, "https://example.com/escrow.wasm", "", nil)
 			require.NoError(t, err)
@@ -620,8 +621,8 @@ func TestExecuteWithDeposit(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			beneficiaryAccount := accKeeper.GetAccount(ctx, spec.beneficiary)
-			assert.Equal(t, deposit, beneficiaryAccount.GetCoins())
+			balances := bankKeeper.GetAllBalances(ctx, spec.beneficiary)
+			assert.Equal(t, deposit, balances)
 		})
 	}
 }
@@ -893,12 +894,12 @@ func TestMigrate(t *testing.T) {
 			assert.Equal(t, spec.codeID, cInfo.CodeID)
 
 			expHistory := []types.ContractCodeHistoryEntry{{
-				Operation: types.InitContractCodeHistoryType,
+				Operation: types.ContractCodeHistoryTypeInit,
 				CodeID:    originalCodeID,
 				Updated:   types.NewAbsoluteTxPosition(ctx),
 				Msg:       initMsgBz,
 			}, {
-				Operation: types.MigrateContractCodeHistoryType,
+				Operation: types.ContractCodeHistoryTypeMigrate,
 				CodeID:    spec.codeID,
 				Updated:   types.NewAbsoluteTxPosition(ctx),
 				Msg:       spec.migrateMsg,

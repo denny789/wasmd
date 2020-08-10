@@ -52,7 +52,7 @@ func main() {
 
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
-		Use:   version.ServerName,
+		Use:   version.AppName,
 		Short: "Wasm Daemon (server)",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {

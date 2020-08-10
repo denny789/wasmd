@@ -24,66 +24,66 @@ func TestValidateParams(t *testing.T) {
 		},
 		"all good with nobody": {
 			src: Params{
-				UploadAccess:                 AllowNobody,
-				DefaultInstantiatePermission: Nobody,
+				CodeUploadAccess:             AllowNobody,
+				InstantiateDefaultPermission: Nobody,
 			},
 		},
 		"all good with everybody": {
 			src: Params{
-				UploadAccess:                 AllowEverybody,
-				DefaultInstantiatePermission: Everybody,
+				CodeUploadAccess:             AllowEverybody,
+				InstantiateDefaultPermission: Everybody,
 			},
 		},
 		"all good with only address": {
 			src: Params{
-				UploadAccess:                 OnlyAddress.With(anyAddress),
-				DefaultInstantiatePermission: OnlyAddress,
+				CodeUploadAccess:             OnlyAddress.With(anyAddress),
+				InstantiateDefaultPermission: OnlyAddress,
 			},
 		},
 		"reject empty type in instantiate permission": {
 			src: Params{
-				UploadAccess:                 AllowNobody,
-				DefaultInstantiatePermission: "",
+				CodeUploadAccess:             AllowNobody,
+				InstantiateDefaultPermission: "",
 			},
 			expErr: true,
 		},
 		"reject unknown type in instantiate": {
 			src: Params{
-				UploadAccess:                 AllowNobody,
-				DefaultInstantiatePermission: "Undefined",
+				CodeUploadAccess:             AllowNobody,
+				InstantiateDefaultPermission: "Undefined",
 			},
 			expErr: true,
 		},
 		"reject invalid address in only address": {
 			src: Params{
-				UploadAccess:                 AccessConfig{Type: OnlyAddress, Address: invalidAddress},
-				DefaultInstantiatePermission: OnlyAddress,
+				CodeUploadAccess:             AccessConfig{Type: OnlyAddress, Address: invalidAddress},
+				InstantiateDefaultPermission: OnlyAddress,
 			},
 			expErr: true,
 		},
-		"reject UploadAccess Everybody with obsolete address": {
+		"reject CodeUploadAccess Everybody with obsolete address": {
 			src: Params{
-				UploadAccess:                 AccessConfig{Type: Everybody, Address: anyAddress},
-				DefaultInstantiatePermission: OnlyAddress,
+				CodeUploadAccess:             AccessConfig{Type: Everybody, Address: anyAddress},
+				InstantiateDefaultPermission: OnlyAddress,
 			},
 			expErr: true,
 		},
-		"reject UploadAccess Nobody with obsolete address": {
+		"reject CodeUploadAccess Nobody with obsolete address": {
 			src: Params{
-				UploadAccess:                 AccessConfig{Type: Nobody, Address: anyAddress},
-				DefaultInstantiatePermission: OnlyAddress,
+				CodeUploadAccess:             AccessConfig{Type: Nobody, Address: anyAddress},
+				InstantiateDefaultPermission: OnlyAddress,
 			},
 			expErr: true,
 		},
-		"reject empty UploadAccess": {
+		"reject empty CodeUploadAccess": {
 			src: Params{
-				DefaultInstantiatePermission: OnlyAddress,
+				InstantiateDefaultPermission: OnlyAddress,
 			},
 			expErr: true,
-		}, "reject undefined permission in UploadAccess": {
+		}, "reject undefined permission in CodeUploadAccess": {
 			src: Params{
-				UploadAccess:                 AccessConfig{Type: Undefined},
-				DefaultInstantiatePermission: OnlyAddress,
+				CodeUploadAccess:             AccessConfig{Type: Undefined},
+				InstantiateDefaultPermission: OnlyAddress,
 			},
 			expErr: true,
 		},

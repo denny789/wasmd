@@ -48,7 +48,7 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 # process linker flags
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=wasm \
-		  -X github.com/cosmos/cosmos-sdk/version.ServerName=wasmd \
+		  -X github.com/cosmos/cosmos-sdk/version.AppName=wasmd \
 		  -X github.com/cosmos/cosmos-sdk/version.ClientName=wasmcli \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
@@ -61,7 +61,7 @@ ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
 coral_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=coral \
-				  -X github.com/cosmos/cosmos-sdk/version.ServerName=corald \
+				  -X github.com/cosmos/cosmos-sdk/version.AppName=corald \
 				  -X github.com/cosmos/cosmos-sdk/version.ClientName=coral \
 				  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 				  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
@@ -76,7 +76,7 @@ coral_ldflags += $(LDFLAGS)
 coral_ldflags := $(strip $(coral_ldflags))
 
 flex_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=gaiaflex \
-				  -X github.com/cosmos/cosmos-sdk/version.ServerName=gaiaflexd \
+				  -X github.com/cosmos/cosmos-sdk/version.AppName=gaiaflexd \
 				  -X github.com/cosmos/cosmos-sdk/version.ClientName=gaiaflex \
 				  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 				  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
@@ -92,9 +92,6 @@ flex_ldflags := $(strip $(flex_ldflags))
 BUILD_FLAGS := -tags $(build_tags) -ldflags '$(ldflags)' -trimpath
 CORAL_BUILD_FLAGS := -tags $(build_tags) -ldflags '$(coral_ldflags)' -trimpath
 FLEX_BUILD_FLAGS := -tags $(build_tags) -ldflags '$(flex_ldflags)' -trimpath
-
-# The below include contains the tools target.
-include contrib/devtools/Makefile
 
 all: install lint test
 
@@ -164,7 +161,6 @@ distclean: clean
 ###############################################################################
 ###                           Tests & Simulation                            ###
 ###############################################################################
-include sims.mk
 
 test: test-unit test-build
 

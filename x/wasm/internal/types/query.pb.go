@@ -4,6 +4,7 @@
 package types
 
 import (
+	bytes "bytes"
 	context "context"
 	encoding_json "encoding/json"
 	fmt "fmt"
@@ -38,9 +39,8 @@ type QueryContractInfoRequest struct {
 	Address github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,1,opt,name=address,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"address,omitempty"`
 }
 
-func (m *QueryContractInfoRequest) Reset()         { *m = QueryContractInfoRequest{} }
-func (m *QueryContractInfoRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryContractInfoRequest) ProtoMessage()    {}
+func (m *QueryContractInfoRequest) Reset()      { *m = QueryContractInfoRequest{} }
+func (*QueryContractInfoRequest) ProtoMessage() {}
 func (*QueryContractInfoRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{0}
 }
@@ -71,13 +71,6 @@ func (m *QueryContractInfoRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryContractInfoRequest proto.InternalMessageInfo
 
-func (m *QueryContractInfoRequest) GetAddress() github_com_cosmos_cosmos_sdk_types.AccAddress {
-	if m != nil {
-		return m.Address
-	}
-	return nil
-}
-
 // QueryContractInfoResponse is the response type for the Query/ContractInfo RPC method
 type QueryContractInfoResponse struct {
 	// address is the address of the contract
@@ -85,9 +78,8 @@ type QueryContractInfoResponse struct {
 	*ContractInfo `protobuf:"bytes,2,opt,name=ContractInfo,proto3,embedded=ContractInfo" json:""`
 }
 
-func (m *QueryContractInfoResponse) Reset()         { *m = QueryContractInfoResponse{} }
-func (m *QueryContractInfoResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryContractInfoResponse) ProtoMessage()    {}
+func (m *QueryContractInfoResponse) Reset()      { *m = QueryContractInfoResponse{} }
+func (*QueryContractInfoResponse) ProtoMessage() {}
 func (*QueryContractInfoResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{1}
 }
@@ -118,20 +110,12 @@ func (m *QueryContractInfoResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryContractInfoResponse proto.InternalMessageInfo
 
-func (m *QueryContractInfoResponse) GetAddress() github_com_cosmos_cosmos_sdk_types.AccAddress {
-	if m != nil {
-		return m.Address
-	}
-	return nil
-}
-
 type QueryContractsByCodeRequest struct {
 	CodeID uint64 `protobuf:"varint,1,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"`
 }
 
-func (m *QueryContractsByCodeRequest) Reset()         { *m = QueryContractsByCodeRequest{} }
-func (m *QueryContractsByCodeRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryContractsByCodeRequest) ProtoMessage()    {}
+func (m *QueryContractsByCodeRequest) Reset()      { *m = QueryContractsByCodeRequest{} }
+func (*QueryContractsByCodeRequest) ProtoMessage() {}
 func (*QueryContractsByCodeRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{2}
 }
@@ -162,22 +146,14 @@ func (m *QueryContractsByCodeRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryContractsByCodeRequest proto.InternalMessageInfo
 
-func (m *QueryContractsByCodeRequest) GetCodeID() uint64 {
-	if m != nil {
-		return m.CodeID
-	}
-	return 0
-}
-
 // ContractInfoWithAddress adds the address (key) to the ContractInfo representation
 type ContractInfoWithAddress struct {
 	Address       github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,1,opt,name=address,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"address,omitempty"`
 	*ContractInfo `protobuf:"bytes,2,opt,name=ContractInfo,proto3,embedded=ContractInfo" json:""`
 }
 
-func (m *ContractInfoWithAddress) Reset()         { *m = ContractInfoWithAddress{} }
-func (m *ContractInfoWithAddress) String() string { return proto.CompactTextString(m) }
-func (*ContractInfoWithAddress) ProtoMessage()    {}
+func (m *ContractInfoWithAddress) Reset()      { *m = ContractInfoWithAddress{} }
+func (*ContractInfoWithAddress) ProtoMessage() {}
 func (*ContractInfoWithAddress) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{3}
 }
@@ -208,20 +184,12 @@ func (m *ContractInfoWithAddress) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ContractInfoWithAddress proto.InternalMessageInfo
 
-func (m *ContractInfoWithAddress) GetAddress() github_com_cosmos_cosmos_sdk_types.AccAddress {
-	if m != nil {
-		return m.Address
-	}
-	return nil
-}
-
 type QueryContractsByCodeResponse struct {
 	ContractInfos []ContractInfoWithAddress `protobuf:"bytes,1,rep,name=contract_infos,json=contractInfos,proto3" json:"contract_infos"`
 }
 
-func (m *QueryContractsByCodeResponse) Reset()         { *m = QueryContractsByCodeResponse{} }
-func (m *QueryContractsByCodeResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryContractsByCodeResponse) ProtoMessage()    {}
+func (m *QueryContractsByCodeResponse) Reset()      { *m = QueryContractsByCodeResponse{} }
+func (*QueryContractsByCodeResponse) ProtoMessage() {}
 func (*QueryContractsByCodeResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{4}
 }
@@ -252,21 +220,13 @@ func (m *QueryContractsByCodeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryContractsByCodeResponse proto.InternalMessageInfo
 
-func (m *QueryContractsByCodeResponse) GetContractInfos() []ContractInfoWithAddress {
-	if m != nil {
-		return m.ContractInfos
-	}
-	return nil
-}
-
 type QueryAllContractStateRequest struct {
 	// address is the address of the contract
 	Address github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,1,opt,name=address,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"address,omitempty"`
 }
 
-func (m *QueryAllContractStateRequest) Reset()         { *m = QueryAllContractStateRequest{} }
-func (m *QueryAllContractStateRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryAllContractStateRequest) ProtoMessage()    {}
+func (m *QueryAllContractStateRequest) Reset()      { *m = QueryAllContractStateRequest{} }
+func (*QueryAllContractStateRequest) ProtoMessage() {}
 func (*QueryAllContractStateRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{5}
 }
@@ -297,20 +257,12 @@ func (m *QueryAllContractStateRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryAllContractStateRequest proto.InternalMessageInfo
 
-func (m *QueryAllContractStateRequest) GetAddress() github_com_cosmos_cosmos_sdk_types.AccAddress {
-	if m != nil {
-		return m.Address
-	}
-	return nil
-}
-
 type QueryAllContractStateResponse struct {
 	Models []Model `protobuf:"bytes,1,rep,name=models,proto3" json:"models"`
 }
 
-func (m *QueryAllContractStateResponse) Reset()         { *m = QueryAllContractStateResponse{} }
-func (m *QueryAllContractStateResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryAllContractStateResponse) ProtoMessage()    {}
+func (m *QueryAllContractStateResponse) Reset()      { *m = QueryAllContractStateResponse{} }
+func (*QueryAllContractStateResponse) ProtoMessage() {}
 func (*QueryAllContractStateResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{6}
 }
@@ -341,22 +293,14 @@ func (m *QueryAllContractStateResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryAllContractStateResponse proto.InternalMessageInfo
 
-func (m *QueryAllContractStateResponse) GetModels() []Model {
-	if m != nil {
-		return m.Models
-	}
-	return nil
-}
-
 type QueryRawContractStateRequest struct {
 	// address is the address of the contract
 	Address   github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,1,opt,name=address,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"address,omitempty"`
 	QueryData []byte                                        `protobuf:"bytes,2,opt,name=query_data,json=queryData,proto3" json:"query_data,omitempty"`
 }
 
-func (m *QueryRawContractStateRequest) Reset()         { *m = QueryRawContractStateRequest{} }
-func (m *QueryRawContractStateRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryRawContractStateRequest) ProtoMessage()    {}
+func (m *QueryRawContractStateRequest) Reset()      { *m = QueryRawContractStateRequest{} }
+func (*QueryRawContractStateRequest) ProtoMessage() {}
 func (*QueryRawContractStateRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{7}
 }
@@ -387,27 +331,12 @@ func (m *QueryRawContractStateRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryRawContractStateRequest proto.InternalMessageInfo
 
-func (m *QueryRawContractStateRequest) GetAddress() github_com_cosmos_cosmos_sdk_types.AccAddress {
-	if m != nil {
-		return m.Address
-	}
-	return nil
-}
-
-func (m *QueryRawContractStateRequest) GetQueryData() []byte {
-	if m != nil {
-		return m.QueryData
-	}
-	return nil
-}
-
 type QueryRawContractStateResponse struct {
 	Models []Model `protobuf:"bytes,1,rep,name=models,proto3" json:"models"`
 }
 
-func (m *QueryRawContractStateResponse) Reset()         { *m = QueryRawContractStateResponse{} }
-func (m *QueryRawContractStateResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryRawContractStateResponse) ProtoMessage()    {}
+func (m *QueryRawContractStateResponse) Reset()      { *m = QueryRawContractStateResponse{} }
+func (*QueryRawContractStateResponse) ProtoMessage() {}
 func (*QueryRawContractStateResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{8}
 }
@@ -438,22 +367,14 @@ func (m *QueryRawContractStateResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryRawContractStateResponse proto.InternalMessageInfo
 
-func (m *QueryRawContractStateResponse) GetModels() []Model {
-	if m != nil {
-		return m.Models
-	}
-	return nil
-}
-
 type QuerySmartContractStateRequest struct {
 	// address is the address of the contract
 	Address   github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,1,opt,name=address,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"address,omitempty"`
 	QueryData []byte                                        `protobuf:"bytes,2,opt,name=query_data,json=queryData,proto3" json:"query_data,omitempty"`
 }
 
-func (m *QuerySmartContractStateRequest) Reset()         { *m = QuerySmartContractStateRequest{} }
-func (m *QuerySmartContractStateRequest) String() string { return proto.CompactTextString(m) }
-func (*QuerySmartContractStateRequest) ProtoMessage()    {}
+func (m *QuerySmartContractStateRequest) Reset()      { *m = QuerySmartContractStateRequest{} }
+func (*QuerySmartContractStateRequest) ProtoMessage() {}
 func (*QuerySmartContractStateRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{9}
 }
@@ -484,27 +405,12 @@ func (m *QuerySmartContractStateRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QuerySmartContractStateRequest proto.InternalMessageInfo
 
-func (m *QuerySmartContractStateRequest) GetAddress() github_com_cosmos_cosmos_sdk_types.AccAddress {
-	if m != nil {
-		return m.Address
-	}
-	return nil
-}
-
-func (m *QuerySmartContractStateRequest) GetQueryData() []byte {
-	if m != nil {
-		return m.QueryData
-	}
-	return nil
-}
-
 type QuerySmartContractStateResponse struct {
 	Data encoding_json.RawMessage `protobuf:"bytes,1,opt,name=data,proto3,casttype=encoding/json.RawMessage" json:"data,omitempty"`
 }
 
-func (m *QuerySmartContractStateResponse) Reset()         { *m = QuerySmartContractStateResponse{} }
-func (m *QuerySmartContractStateResponse) String() string { return proto.CompactTextString(m) }
-func (*QuerySmartContractStateResponse) ProtoMessage()    {}
+func (m *QuerySmartContractStateResponse) Reset()      { *m = QuerySmartContractStateResponse{} }
+func (*QuerySmartContractStateResponse) ProtoMessage() {}
 func (*QuerySmartContractStateResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{10}
 }
@@ -535,20 +441,12 @@ func (m *QuerySmartContractStateResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QuerySmartContractStateResponse proto.InternalMessageInfo
 
-func (m *QuerySmartContractStateResponse) GetData() encoding_json.RawMessage {
-	if m != nil {
-		return m.Data
-	}
-	return nil
-}
-
 type QueryCodeRequest struct {
 	CodeID uint64 `protobuf:"varint,1,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"`
 }
 
-func (m *QueryCodeRequest) Reset()         { *m = QueryCodeRequest{} }
-func (m *QueryCodeRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryCodeRequest) ProtoMessage()    {}
+func (m *QueryCodeRequest) Reset()      { *m = QueryCodeRequest{} }
+func (*QueryCodeRequest) ProtoMessage() {}
 func (*QueryCodeRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{11}
 }
@@ -579,13 +477,6 @@ func (m *QueryCodeRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryCodeRequest proto.InternalMessageInfo
 
-func (m *QueryCodeRequest) GetCodeID() uint64 {
-	if m != nil {
-		return m.CodeID
-	}
-	return 0
-}
-
 type CodeInfoResponse struct {
 	CodeID   uint64                                               `protobuf:"varint,1,opt,name=code_id,json=codeId,proto3" json:"id"`
 	Creator  github_com_cosmos_cosmos_sdk_types.AccAddress        `protobuf:"bytes,2,opt,name=creator,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"creator,omitempty"`
@@ -594,9 +485,8 @@ type CodeInfoResponse struct {
 	Builder  string                                               `protobuf:"bytes,5,opt,name=builder,proto3" json:"builder,omitempty"`
 }
 
-func (m *CodeInfoResponse) Reset()         { *m = CodeInfoResponse{} }
-func (m *CodeInfoResponse) String() string { return proto.CompactTextString(m) }
-func (*CodeInfoResponse) ProtoMessage()    {}
+func (m *CodeInfoResponse) Reset()      { *m = CodeInfoResponse{} }
+func (*CodeInfoResponse) ProtoMessage() {}
 func (*CodeInfoResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{12}
 }
@@ -627,49 +517,13 @@ func (m *CodeInfoResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CodeInfoResponse proto.InternalMessageInfo
 
-func (m *CodeInfoResponse) GetCodeID() uint64 {
-	if m != nil {
-		return m.CodeID
-	}
-	return 0
-}
-
-func (m *CodeInfoResponse) GetCreator() github_com_cosmos_cosmos_sdk_types.AccAddress {
-	if m != nil {
-		return m.Creator
-	}
-	return nil
-}
-
-func (m *CodeInfoResponse) GetDataHash() github_com_tendermint_tendermint_libs_bytes.HexBytes {
-	if m != nil {
-		return m.DataHash
-	}
-	return nil
-}
-
-func (m *CodeInfoResponse) GetSource() string {
-	if m != nil {
-		return m.Source
-	}
-	return ""
-}
-
-func (m *CodeInfoResponse) GetBuilder() string {
-	if m != nil {
-		return m.Builder
-	}
-	return ""
-}
-
 type QueryCodeResponse struct {
 	*CodeInfoResponse `protobuf:"bytes,1,opt,name=code_info,json=codeInfo,proto3,embedded=code_info" json:""`
 	Data              []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data"`
 }
 
-func (m *QueryCodeResponse) Reset()         { *m = QueryCodeResponse{} }
-func (m *QueryCodeResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryCodeResponse) ProtoMessage()    {}
+func (m *QueryCodeResponse) Reset()      { *m = QueryCodeResponse{} }
+func (*QueryCodeResponse) ProtoMessage() {}
 func (*QueryCodeResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{13}
 }
@@ -700,20 +554,12 @@ func (m *QueryCodeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryCodeResponse proto.InternalMessageInfo
 
-func (m *QueryCodeResponse) GetData() []byte {
-	if m != nil {
-		return m.Data
-	}
-	return nil
-}
-
 type QueryCodesResponse struct {
 	CodeInfos []CodeInfoResponse `protobuf:"bytes,1,rep,name=code_infos,json=codeInfos,proto3" json:"code_infos"`
 }
 
-func (m *QueryCodesResponse) Reset()         { *m = QueryCodesResponse{} }
-func (m *QueryCodesResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryCodesResponse) ProtoMessage()    {}
+func (m *QueryCodesResponse) Reset()      { *m = QueryCodesResponse{} }
+func (*QueryCodesResponse) ProtoMessage() {}
 func (*QueryCodesResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_845473e9a3330642, []int{14}
 }
@@ -744,13 +590,6 @@ func (m *QueryCodesResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryCodesResponse proto.InternalMessageInfo
 
-func (m *QueryCodesResponse) GetCodeInfos() []CodeInfoResponse {
-	if m != nil {
-		return m.CodeInfos
-	}
-	return nil
-}
-
 func init() {
 	proto.RegisterType((*QueryContractInfoRequest)(nil), "wasmd.x.wasmd.QueryContractInfoRequest")
 	proto.RegisterType((*QueryContractInfoResponse)(nil), "wasmd.x.wasmd.QueryContractInfoResponse")
@@ -772,61 +611,470 @@ func init() {
 func init() { proto.RegisterFile("x/wasm/internal/types/query.proto", fileDescriptor_845473e9a3330642) }
 
 var fileDescriptor_845473e9a3330642 = []byte{
-	// 856 bytes of a gzipped FileDescriptorProto
+	// 869 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0xcd, 0x6e, 0xdb, 0x46,
-	0x10, 0x16, 0x1d, 0x59, 0xb6, 0x26, 0x4e, 0xeb, 0x2e, 0x82, 0x94, 0x95, 0x1d, 0x51, 0x61, 0x81,
-	0x56, 0xfd, 0x31, 0x99, 0xaa, 0x05, 0xda, 0xab, 0x69, 0xb5, 0x88, 0x1a, 0xe4, 0x50, 0x0a, 0x45,
+	0x10, 0x26, 0x1d, 0x59, 0xb6, 0x26, 0x4e, 0xeb, 0x2e, 0x82, 0x94, 0x95, 0x1d, 0xd2, 0x61, 0x81,
+	0x56, 0xfd, 0x31, 0x99, 0xba, 0x05, 0xda, 0xab, 0x69, 0xb7, 0x88, 0x11, 0xe4, 0x50, 0x1a, 0x6d,
 	0x80, 0x5c, 0x84, 0x15, 0xb9, 0xa6, 0xd8, 0x90, 0x5c, 0x85, 0xbb, 0x82, 0xa5, 0x57, 0x28, 0x7a,
-	0x28, 0xd0, 0x27, 0x29, 0xfa, 0x0e, 0x45, 0x8e, 0x3e, 0xf6, 0x44, 0x14, 0xf2, 0xcd, 0x8f, 0xe0,
-	0x53, 0xc1, 0xe5, 0x52, 0xa6, 0x64, 0x31, 0x71, 0xdb, 0x04, 0xf0, 0x45, 0xe4, 0x6a, 0x67, 0xbe,
-	0x6f, 0xbe, 0x99, 0xd5, 0xa7, 0x85, 0x07, 0x53, 0xf3, 0x04, 0xb3, 0xd0, 0xf4, 0x23, 0x4e, 0xe2,
-	0x08, 0x07, 0x26, 0x9f, 0x8d, 0x09, 0x33, 0x5f, 0x4c, 0x48, 0x3c, 0x33, 0xc6, 0x31, 0xe5, 0x14,
-	0xdd, 0x49, 0x03, 0x5c, 0x63, 0x6a, 0x88, 0x67, 0xe3, 0xae, 0x47, 0x3d, 0x2a, 0x76, 0xcc, 0xf4,
-	0x2d, 0x0b, 0x6a, 0x94, 0xe0, 0x88, 0x4f, 0x19, 0xb2, 0xe7, 0x51, 0xea, 0x05, 0xc4, 0x14, 0xab,
-	0xe1, 0xe4, 0xd8, 0x24, 0xe1, 0x98, 0x4b, 0x12, 0xdd, 0x03, 0xf5, 0x87, 0x94, 0xf3, 0x88, 0x46,
-	0x3c, 0xc6, 0x0e, 0xef, 0x45, 0xc7, 0xd4, 0x26, 0x2f, 0x26, 0x84, 0x71, 0xf4, 0x18, 0xb6, 0xb0,
-	0xeb, 0xc6, 0x84, 0x31, 0x55, 0x69, 0x29, 0xed, 0x1d, 0xeb, 0x8b, 0x8b, 0x44, 0x3b, 0xf0, 0x7c,
-	0x3e, 0x9a, 0x0c, 0x0d, 0x87, 0x86, 0xa6, 0x43, 0x59, 0x48, 0x99, 0x7c, 0x1c, 0x30, 0xf7, 0xb9,
-	0xe4, 0x3d, 0x74, 0x9c, 0xc3, 0x2c, 0xd1, 0xce, 0x11, 0xf4, 0x3f, 0x14, 0xf8, 0x60, 0x0d, 0x13,
-	0x1b, 0xd3, 0x88, 0x91, 0x37, 0x4a, 0x85, 0x7a, 0xb0, 0x53, 0x24, 0x51, 0x37, 0x5a, 0x4a, 0xfb,
-	0x76, 0x67, 0xcf, 0x58, 0xea, 0xa7, 0x51, 0x0c, 0xb1, 0xb6, 0x4f, 0x13, 0x4d, 0x39, 0x4f, 0xb4,
-	0x8a, 0xbd, 0x94, 0xaa, 0x5b, 0xb0, 0xb7, 0x54, 0x34, 0xb3, 0x66, 0x47, 0xd4, 0x25, 0x79, 0x87,
-	0x3e, 0x84, 0x2d, 0x87, 0xba, 0x64, 0xe0, 0xbb, 0xa2, 0xec, 0xaa, 0x05, 0xf3, 0x44, 0xab, 0xa5,
-	0x11, 0xbd, 0xae, 0x5d, 0x4b, 0xb7, 0x7a, 0xae, 0xfe, 0xbb, 0x02, 0xef, 0x17, 0x41, 0x9f, 0xfa,
-	0x7c, 0x24, 0x6b, 0xbe, 0xb1, 0xba, 0x19, 0xec, 0xaf, 0xd7, 0x2d, 0xe7, 0xd5, 0x87, 0x77, 0x1c,
-	0xb9, 0x35, 0xf0, 0xa3, 0x63, 0x9a, 0x96, 0x7f, 0xab, 0x7d, 0xbb, 0xf3, 0xd1, 0x2b, 0xc8, 0x0a,
-	0xba, 0xad, 0xea, 0xcb, 0x94, 0xf3, 0x8e, 0x53, 0xd8, 0x66, 0xfa, 0x73, 0x49, 0x7a, 0x18, 0x04,
-	0x79, 0x5e, 0x9f, 0x63, 0x4e, 0xde, 0xca, 0x79, 0xec, 0xc3, 0xfd, 0x12, 0x32, 0x29, 0xb1, 0x03,
-	0xb5, 0x90, 0xba, 0x24, 0xc8, 0xa5, 0xdd, 0x5d, 0x91, 0xf6, 0x24, 0xdd, 0x94, 0x42, 0x64, 0xa4,
-	0xfe, 0xb3, 0x22, 0x25, 0xd8, 0xf8, 0xe4, 0xad, 0x4b, 0x40, 0xf7, 0x01, 0x84, 0x5f, 0x0c, 0x5c,
-	0xcc, 0xb1, 0x98, 0xf6, 0x8e, 0x5d, 0x17, 0xdf, 0x74, 0x31, 0xc7, 0x0b, 0x85, 0x57, 0x6b, 0xf9,
-	0x1f, 0x0a, 0x7f, 0x51, 0xa0, 0x29, 0x50, 0xfb, 0x21, 0x8e, 0xf9, 0x0d, 0xd0, 0xa8, 0x95, 0x56,
-	0x23, 0x55, 0x3e, 0x84, 0xaa, 0xc8, 0xcd, 0x6a, 0xd9, 0xbf, 0x48, 0x34, 0x95, 0x44, 0x0e, 0x75,
-	0xfd, 0xc8, 0x33, 0x7f, 0x62, 0x34, 0x32, 0x6c, 0x7c, 0xf2, 0x84, 0x30, 0x86, 0x3d, 0x62, 0x8b,
-	0x48, 0xfd, 0x6b, 0xd8, 0x95, 0x87, 0xff, 0x5f, 0xfe, 0xd2, 0x7f, 0xdb, 0x80, 0x5d, 0xf1, 0x55,
-	0xd1, 0xda, 0x3e, 0x59, 0xcd, 0xdc, 0xbd, 0xcc, 0x3c, 0x4f, 0xb4, 0x0d, 0xdf, 0xcd, 0xf3, 0xd3,
-	0xce, 0x39, 0x31, 0xc1, 0x9c, 0xc6, 0x99, 0xd2, 0xff, 0xd4, 0x39, 0x89, 0x80, 0x7e, 0x84, 0x7a,
-	0xaa, 0x66, 0x30, 0xc2, 0x6c, 0xa4, 0xde, 0x12, 0x70, 0xdf, 0x5c, 0x24, 0xda, 0x57, 0x05, 0x38,
-	0x4e, 0x22, 0x97, 0xc4, 0xa1, 0x1f, 0xf1, 0xe2, 0x6b, 0xe0, 0x0f, 0x99, 0x39, 0x9c, 0x71, 0xc2,
-	0x8c, 0x47, 0x64, 0x6a, 0xa5, 0x2f, 0xf6, 0x76, 0x0a, 0xf5, 0x08, 0xb3, 0x11, 0xba, 0x07, 0x35,
-	0x46, 0x27, 0xb1, 0x43, 0xd4, 0x6a, 0x4b, 0x69, 0xd7, 0x6d, 0xb9, 0x42, 0x2a, 0x6c, 0x0d, 0x27,
-	0x7e, 0xe0, 0x92, 0x58, 0xdd, 0x14, 0x1b, 0xf9, 0x52, 0x9f, 0xc1, 0x7b, 0x85, 0x76, 0xca, 0xae,
-	0x7c, 0x07, 0xf5, 0xac, 0x2b, 0xa9, 0x51, 0x29, 0xc2, 0xa8, 0xb4, 0x2b, 0xde, 0xb1, 0xdc, 0xc9,
-	0x82, 0x59, 0x6d, 0x3b, 0x72, 0x0f, 0xed, 0xcb, 0xe9, 0x66, 0xfd, 0xda, 0x3e, 0x4f, 0x34, 0xb1,
-	0x96, 0x93, 0x7c, 0x06, 0x68, 0x41, 0xcd, 0x16, 0xdc, 0x5d, 0x80, 0x05, 0x77, 0x7e, 0xf6, 0x5f,
-	0x4b, 0x9e, 0xfd, 0x0c, 0xea, 0x39, 0x31, 0xeb, 0xfc, 0xb9, 0x09, 0x9b, 0x02, 0x1c, 0x39, 0xcb,
-	0xbe, 0x8b, 0x3e, 0x5e, 0xc1, 0x2a, 0xfb, 0x83, 0x6d, 0xb4, 0x5f, 0x1f, 0x98, 0xb1, 0xeb, 0x15,
-	0x14, 0xc0, 0xbb, 0x2b, 0x66, 0x8c, 0x3e, 0x7d, 0x55, 0xfa, 0xf2, 0x3f, 0x55, 0xe3, 0xb3, 0x6b,
-	0xc5, 0x2e, 0xd8, 0x28, 0xec, 0xae, 0x1a, 0x23, 0x5a, 0x0b, 0x51, 0xe2, 0xd5, 0x8d, 0xcf, 0xaf,
-	0x17, 0x5c, 0x24, 0x5c, 0xf5, 0xa9, 0xf5, 0x84, 0x25, 0xce, 0xba, 0x9e, 0xb0, 0xcc, 0xfa, 0xf4,
-	0x0a, 0x9a, 0x00, 0xba, 0x6a, 0x1a, 0xe8, 0x60, 0x1d, 0x4a, 0xa9, 0xd5, 0x35, 0x8c, 0xeb, 0x86,
-	0x2f, 0x68, 0x1f, 0x43, 0x55, 0xcc, 0x4e, 0x5b, 0x3f, 0x8f, 0xcb, 0x81, 0xb5, 0xca, 0x03, 0x16,
-	0x60, 0x5d, 0xd8, 0x14, 0x27, 0x1b, 0xdd, 0x33, 0xb2, 0x3b, 0x9e, 0x91, 0xdf, 0xf1, 0x8c, 0x6f,
-	0xd3, 0x3b, 0x5e, 0xe3, 0x41, 0x19, 0x08, 0xbb, 0x44, 0xb1, 0xbe, 0x7f, 0x39, 0x6f, 0x2a, 0xa7,
-	0xf3, 0xa6, 0xf2, 0xf7, 0xbc, 0xa9, 0xfc, 0x7a, 0xd6, 0xac, 0x9c, 0x9e, 0x35, 0x2b, 0x7f, 0x9d,
-	0x35, 0x2b, 0xcf, 0x1e, 0x16, 0xbc, 0xe2, 0x88, 0xb2, 0xf0, 0x69, 0x7a, 0xd3, 0x14, 0x48, 0xe6,
-	0x54, 0x3e, 0x97, 0xef, 0x9d, 0xc3, 0x9a, 0x28, 0xe0, 0xcb, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff,
-	0xb9, 0x90, 0x43, 0x51, 0xdf, 0x0a, 0x00, 0x00,
+	0x28, 0xd0, 0x97, 0xe8, 0xb5, 0xe8, 0x3b, 0x14, 0x3e, 0xfa, 0x98, 0x13, 0xd1, 0xc8, 0x37, 0x3f,
+	0x82, 0x4f, 0x05, 0x97, 0x4b, 0x99, 0x92, 0xc5, 0xc4, 0x6d, 0x13, 0x20, 0x17, 0x91, 0xab, 0x9d,
+	0xf9, 0xbe, 0xf9, 0x66, 0x56, 0x9f, 0x16, 0xee, 0x8d, 0xec, 0x63, 0xcc, 0x62, 0x3b, 0x4c, 0x38,
+	0x49, 0x13, 0x1c, 0xd9, 0x7c, 0x3c, 0x20, 0xcc, 0x7e, 0x36, 0x24, 0xe9, 0xd8, 0x1a, 0xa4, 0x94,
+	0x53, 0x74, 0x2b, 0x0f, 0xf0, 0xad, 0x91, 0x25, 0x9e, 0xed, 0xdb, 0x01, 0x0d, 0xa8, 0xd8, 0xb1,
+	0xf3, 0xb7, 0x22, 0xa8, 0x5d, 0x83, 0x23, 0x3e, 0x65, 0xc8, 0x46, 0x40, 0x69, 0x10, 0x11, 0x5b,
+	0xac, 0x7a, 0xc3, 0x23, 0x9b, 0xc4, 0x03, 0x2e, 0x49, 0xcc, 0x00, 0xb4, 0xef, 0x73, 0xce, 0x3d,
+	0x9a, 0xf0, 0x14, 0x7b, 0xfc, 0x20, 0x39, 0xa2, 0x2e, 0x79, 0x36, 0x24, 0x8c, 0xa3, 0x87, 0xb0,
+	0x82, 0x7d, 0x3f, 0x25, 0x8c, 0x69, 0xea, 0x96, 0xda, 0x59, 0x73, 0xbe, 0xb8, 0xc8, 0x8c, 0xed,
+	0x20, 0xe4, 0xfd, 0x61, 0xcf, 0xf2, 0x68, 0x6c, 0x7b, 0x94, 0xc5, 0x94, 0xc9, 0xc7, 0x36, 0xf3,
+	0x9f, 0x4a, 0xde, 0x5d, 0xcf, 0xdb, 0x2d, 0x12, 0xdd, 0x12, 0xc1, 0xfc, 0x53, 0x85, 0x0f, 0x16,
+	0x30, 0xb1, 0x01, 0x4d, 0x18, 0x79, 0xad, 0x54, 0xe8, 0x00, 0xd6, 0xaa, 0x24, 0xda, 0xd2, 0x96,
+	0xda, 0xb9, 0xb9, 0xb3, 0x61, 0xcd, 0xf4, 0xd3, 0xaa, 0x86, 0x38, 0xab, 0xa7, 0x99, 0xa1, 0x9e,
+	0x67, 0x86, 0xe2, 0xce, 0xa4, 0x9a, 0x0e, 0x6c, 0xcc, 0x14, 0xcd, 0x9c, 0xf1, 0x1e, 0xf5, 0x49,
+	0xd9, 0xa1, 0x0f, 0x61, 0xc5, 0xa3, 0x3e, 0xe9, 0x86, 0xbe, 0x28, 0xbb, 0xe1, 0xc0, 0x24, 0x33,
+	0x9a, 0x79, 0xc4, 0xc1, 0xbe, 0xdb, 0xcc, 0xb7, 0x0e, 0x7c, 0xf3, 0x0f, 0x15, 0xde, 0xaf, 0x82,
+	0x3e, 0x0e, 0x79, 0x5f, 0xd6, 0xfc, 0xd6, 0xea, 0x66, 0xb0, 0xb9, 0x58, 0xb7, 0x9c, 0xd7, 0x21,
+	0xbc, 0xe3, 0xc9, 0xad, 0x6e, 0x98, 0x1c, 0xd1, 0xbc, 0xfc, 0x1b, 0x9d, 0x9b, 0x3b, 0x1f, 0xbd,
+	0x84, 0xac, 0xa2, 0xdb, 0x69, 0x9c, 0xe4, 0x9c, 0xb7, 0xbc, 0xca, 0x36, 0x33, 0x9f, 0x4a, 0xd2,
+	0xdd, 0x28, 0x2a, 0xf3, 0x0e, 0x39, 0xe6, 0xe4, 0x8d, 0x9c, 0xc7, 0x43, 0xb8, 0x5b, 0x43, 0x26,
+	0x25, 0xee, 0x40, 0x33, 0xa6, 0x3e, 0x89, 0x4a, 0x69, 0xb7, 0xe7, 0xa4, 0x3d, 0xca, 0x37, 0xa5,
+	0x10, 0x19, 0x69, 0xfe, 0xac, 0x4a, 0x09, 0x2e, 0x3e, 0x7e, 0xe3, 0x12, 0xd0, 0x5d, 0x00, 0xe1,
+	0x17, 0x5d, 0x1f, 0x73, 0x2c, 0xa6, 0xbd, 0xe6, 0xb6, 0xc4, 0x37, 0xfb, 0x98, 0xe3, 0xa9, 0xc2,
+	0xab, 0xb5, 0xfc, 0x0f, 0x85, 0xbf, 0xa8, 0xa0, 0x0b, 0xd4, 0xc3, 0x18, 0xa7, 0xfc, 0x2d, 0xd0,
+	0x68, 0xd4, 0x56, 0x23, 0x55, 0xde, 0x87, 0x86, 0xc8, 0x2d, 0x6a, 0xd9, 0xbc, 0xc8, 0x0c, 0x8d,
+	0x24, 0x1e, 0xf5, 0xc3, 0x24, 0xb0, 0x7f, 0x62, 0x34, 0xb1, 0x5c, 0x7c, 0xfc, 0x88, 0x30, 0x86,
+	0x03, 0xe2, 0x8a, 0x48, 0xf3, 0x6b, 0x58, 0x97, 0x87, 0xff, 0x5f, 0xfe, 0xd2, 0x7f, 0x5b, 0x82,
+	0x75, 0xf1, 0x55, 0xd5, 0xda, 0x3e, 0x99, 0xcf, 0x5c, 0xbf, 0xcc, 0x3c, 0xcf, 0x8c, 0xa5, 0xd0,
+	0x2f, 0xf3, 0xf3, 0xce, 0x79, 0x29, 0xc1, 0x9c, 0xa6, 0x85, 0xd2, 0xff, 0xd4, 0x39, 0x89, 0x80,
+	0x7e, 0x80, 0x56, 0xae, 0xa6, 0xdb, 0xc7, 0xac, 0xaf, 0xdd, 0x10, 0x70, 0xdf, 0x5c, 0x64, 0xc6,
+	0x57, 0x15, 0x38, 0x4e, 0x12, 0x9f, 0xa4, 0x71, 0x98, 0xf0, 0xea, 0x6b, 0x14, 0xf6, 0x98, 0xdd,
+	0x1b, 0x73, 0xc2, 0xac, 0x07, 0x64, 0xe4, 0xe4, 0x2f, 0xee, 0x6a, 0x0e, 0xf5, 0x00, 0xb3, 0x3e,
+	0xba, 0x03, 0x4d, 0x46, 0x87, 0xa9, 0x47, 0xb4, 0xc6, 0x96, 0xda, 0x69, 0xb9, 0x72, 0x85, 0x34,
+	0x58, 0xe9, 0x0d, 0xc3, 0xc8, 0x27, 0xa9, 0xb6, 0x2c, 0x36, 0xca, 0xa5, 0x39, 0x86, 0xf7, 0x2a,
+	0xed, 0x94, 0x5d, 0xf9, 0x0e, 0x5a, 0x45, 0x57, 0x72, 0xa3, 0x52, 0x85, 0x51, 0x19, 0x57, 0xbc,
+	0x63, 0xb6, 0x93, 0x15, 0xb3, 0x5a, 0xf5, 0xe4, 0x1e, 0xda, 0x94, 0xd3, 0x2d, 0xfa, 0xb5, 0x7a,
+	0x9e, 0x19, 0x62, 0x2d, 0x27, 0xf9, 0x04, 0xd0, 0x94, 0x9a, 0x4d, 0xb9, 0xf7, 0x01, 0xa6, 0xdc,
+	0xe5, 0xd9, 0x7f, 0x25, 0x79, 0xf1, 0x33, 0x68, 0x95, 0xc4, 0x6c, 0xe7, 0xaf, 0x65, 0x58, 0x16,
+	0xe0, 0xc8, 0x9b, 0xf5, 0x5d, 0xf4, 0xf1, 0x1c, 0x56, 0xdd, 0x1f, 0x6c, 0xbb, 0xf3, 0xea, 0xc0,
+	0x82, 0xdd, 0x54, 0x50, 0x04, 0xef, 0xce, 0x99, 0x31, 0xfa, 0xf4, 0x65, 0xe9, 0xb3, 0xff, 0x54,
+	0xed, 0xcf, 0xae, 0x15, 0x3b, 0x65, 0xa3, 0xb0, 0x3e, 0x6f, 0x8c, 0x68, 0x21, 0x44, 0x8d, 0x57,
+	0xb7, 0x3f, 0xbf, 0x5e, 0x70, 0x95, 0x70, 0xde, 0xa7, 0x16, 0x13, 0xd6, 0x38, 0xeb, 0x62, 0xc2,
+	0x3a, 0xeb, 0x33, 0x15, 0x34, 0x04, 0x74, 0xd5, 0x34, 0xd0, 0xf6, 0x22, 0x94, 0x5a, 0xab, 0x6b,
+	0x5b, 0xd7, 0x0d, 0x9f, 0xd2, 0x3e, 0x84, 0x86, 0x98, 0x9d, 0xb1, 0x78, 0x1e, 0x97, 0x03, 0xdb,
+	0xaa, 0x0f, 0x98, 0x82, 0xed, 0xc3, 0xb2, 0x38, 0xd9, 0xe8, 0x8e, 0x55, 0xdc, 0xf1, 0xac, 0xf2,
+	0x8e, 0x67, 0x7d, 0x9b, 0xdf, 0xf1, 0xda, 0xf7, 0xea, 0x40, 0xd8, 0x25, 0x8a, 0xf3, 0xe3, 0xc9,
+	0x0b, 0x5d, 0x79, 0xfe, 0x42, 0x57, 0x7e, 0x9f, 0xe8, 0xea, 0xc9, 0x44, 0x57, 0x4f, 0x27, 0xba,
+	0xfa, 0xf7, 0x44, 0x57, 0x7f, 0x3d, 0xd3, 0x95, 0xd3, 0x33, 0x5d, 0x79, 0x7e, 0xa6, 0x2b, 0x4f,
+	0xee, 0x57, 0x7c, 0x63, 0x8f, 0xb2, 0xf8, 0x71, 0x7e, 0xeb, 0x14, 0xa8, 0xf6, 0x48, 0x3e, 0x67,
+	0xef, 0xa0, 0xbd, 0xa6, 0x28, 0xe6, 0xcb, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x66, 0x7c, 0xd6,
+	0xe8, 0xeb, 0x0a, 0x00, 0x00,
+}
+
+func (this *QueryContractInfoRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryContractInfoRequest)
+	if !ok {
+		that2, ok := that.(QueryContractInfoRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !bytes.Equal(this.Address, that1.Address) {
+		return false
+	}
+	return true
+}
+func (this *QueryContractInfoResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryContractInfoResponse)
+	if !ok {
+		that2, ok := that.(QueryContractInfoResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !bytes.Equal(this.Address, that1.Address) {
+		return false
+	}
+	if !this.ContractInfo.Equal(that1.ContractInfo) {
+		return false
+	}
+	return true
+}
+func (this *QueryContractsByCodeRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryContractsByCodeRequest)
+	if !ok {
+		that2, ok := that.(QueryContractsByCodeRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.CodeID != that1.CodeID {
+		return false
+	}
+	return true
+}
+func (this *ContractInfoWithAddress) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ContractInfoWithAddress)
+	if !ok {
+		that2, ok := that.(ContractInfoWithAddress)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !bytes.Equal(this.Address, that1.Address) {
+		return false
+	}
+	if !this.ContractInfo.Equal(that1.ContractInfo) {
+		return false
+	}
+	return true
+}
+func (this *QueryContractsByCodeResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryContractsByCodeResponse)
+	if !ok {
+		that2, ok := that.(QueryContractsByCodeResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.ContractInfos) != len(that1.ContractInfos) {
+		return false
+	}
+	for i := range this.ContractInfos {
+		if !this.ContractInfos[i].Equal(&that1.ContractInfos[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *QueryAllContractStateRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryAllContractStateRequest)
+	if !ok {
+		that2, ok := that.(QueryAllContractStateRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !bytes.Equal(this.Address, that1.Address) {
+		return false
+	}
+	return true
+}
+func (this *QueryAllContractStateResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryAllContractStateResponse)
+	if !ok {
+		that2, ok := that.(QueryAllContractStateResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.Models) != len(that1.Models) {
+		return false
+	}
+	for i := range this.Models {
+		if !this.Models[i].Equal(&that1.Models[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *QueryRawContractStateRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryRawContractStateRequest)
+	if !ok {
+		that2, ok := that.(QueryRawContractStateRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !bytes.Equal(this.Address, that1.Address) {
+		return false
+	}
+	if !bytes.Equal(this.QueryData, that1.QueryData) {
+		return false
+	}
+	return true
+}
+func (this *QueryRawContractStateResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryRawContractStateResponse)
+	if !ok {
+		that2, ok := that.(QueryRawContractStateResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.Models) != len(that1.Models) {
+		return false
+	}
+	for i := range this.Models {
+		if !this.Models[i].Equal(&that1.Models[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *QuerySmartContractStateRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QuerySmartContractStateRequest)
+	if !ok {
+		that2, ok := that.(QuerySmartContractStateRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !bytes.Equal(this.Address, that1.Address) {
+		return false
+	}
+	if !bytes.Equal(this.QueryData, that1.QueryData) {
+		return false
+	}
+	return true
+}
+func (this *QuerySmartContractStateResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QuerySmartContractStateResponse)
+	if !ok {
+		that2, ok := that.(QuerySmartContractStateResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !bytes.Equal(this.Data, that1.Data) {
+		return false
+	}
+	return true
+}
+func (this *QueryCodeRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryCodeRequest)
+	if !ok {
+		that2, ok := that.(QueryCodeRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.CodeID != that1.CodeID {
+		return false
+	}
+	return true
+}
+func (this *CodeInfoResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*CodeInfoResponse)
+	if !ok {
+		that2, ok := that.(CodeInfoResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.CodeID != that1.CodeID {
+		return false
+	}
+	if !bytes.Equal(this.Creator, that1.Creator) {
+		return false
+	}
+	if !bytes.Equal(this.DataHash, that1.DataHash) {
+		return false
+	}
+	if this.Source != that1.Source {
+		return false
+	}
+	if this.Builder != that1.Builder {
+		return false
+	}
+	return true
+}
+func (this *QueryCodeResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryCodeResponse)
+	if !ok {
+		that2, ok := that.(QueryCodeResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.CodeInfoResponse.Equal(that1.CodeInfoResponse) {
+		return false
+	}
+	if !bytes.Equal(this.Data, that1.Data) {
+		return false
+	}
+	return true
+}
+func (this *QueryCodesResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueryCodesResponse)
+	if !ok {
+		that2, ok := that.(QueryCodesResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.CodeInfos) != len(that1.CodeInfos) {
+		return false
+	}
+	for i := range this.CodeInfos {
+		if !this.CodeInfos[i].Equal(&that1.CodeInfos[i]) {
+			return false
+		}
+	}
+	return true
 }
 
 // Reference imports to suppress errors if they are not otherwise used.

@@ -52,7 +52,7 @@ func initRecurseContract(t *testing.T) (contract sdk.AccAddress, creator sdk.Acc
 		},
 	}
 	ctx, keepers := CreateTestInput(t, false, tempDir, SupportedFeatures, nil, countingQuerier)
-	accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
+	accKeeper, bankKeeper, keeper := keepers.AccountKeeper, keepers.BankKeeper, keepers.WasmKeeper
 	realWasmQuerier = WasmQuerier(&keeper)
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
