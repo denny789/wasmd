@@ -29,6 +29,11 @@ func (msg MsgStoreCode) ValidateBasic() error {
 	if err := validateBuilder(msg.Builder); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "builder %s", err.Error())
 	}
+	if msg.InstantiatePermission != nil {
+		if err := msg.InstantiatePermission.ValidateBasic(); err != nil {
+			return sdkerrors.Wrap(err, "instantiate permission")
+		}
+	}
 	return nil
 }
 
@@ -53,7 +58,7 @@ func (msg MsgInstantiateContract) ValidateBasic() error {
 		return err
 	}
 
-	if msg.Code == 0 {
+	if msg.CodeID == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "code_id is required")
 	}
 
@@ -61,14 +66,17 @@ func (msg MsgInstantiateContract) ValidateBasic() error {
 		return err
 	}
 
-	if msg.InitFunds.IsAnyNegative() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "negative InitFunds")
+	if !msg.InitFunds.IsValid() {
+		return sdkerrors.ErrInvalidCoins
 	}
 
 	if len(msg.Admin) != 0 {
 		if err := sdk.VerifyAddressFormat(msg.Admin); err != nil {
 			return err
 		}
+	}
+	if !json.Valid(msg.InitMsg) {
+		return sdkerrors.Wrap(ErrInvalid, "init msg json")
 	}
 	return nil
 }
@@ -97,8 +105,11 @@ func (msg MsgExecuteContract) ValidateBasic() error {
 		return err
 	}
 
-	if msg.SentFunds.IsAnyNegative() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "negative SentFunds")
+	if !msg.SentFunds.IsValid() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "sentFunds")
+	}
+	if !json.Valid(msg.Msg) {
+		return sdkerrors.Wrap(ErrInvalid, "msg json")
 	}
 	return nil
 }
@@ -120,7 +131,7 @@ func (msg MsgMigrateContract) Type() string {
 }
 
 func (msg MsgMigrateContract) ValidateBasic() error {
-	if msg.Code == 0 {
+	if msg.CodeID == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "code_id is required")
 	}
 	if err := sdk.VerifyAddressFormat(msg.Sender); err != nil {
@@ -129,6 +140,10 @@ func (msg MsgMigrateContract) ValidateBasic() error {
 	if err := sdk.VerifyAddressFormat(msg.Contract); err != nil {
 		return sdkerrors.Wrap(err, "contract")
 	}
+	if !json.Valid(msg.MigrateMsg) {
+		return sdkerrors.Wrap(ErrInvalid, "migrate msg json")
+	}
+
 	return nil
 }
 

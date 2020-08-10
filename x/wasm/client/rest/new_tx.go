@@ -84,7 +84,7 @@ func migrateContractHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		msg := &types.MsgMigrateContract{
 			Sender:     cliCtx.GetFromAddress(),
 			Contract:   contractAddress,
-			Code:       req.CodeID,
+			CodeID:     req.CodeID,
 			MigrateMsg: req.MigrateMsg,
 		}
 		if err = msg.ValidateBasic(); err != nil {

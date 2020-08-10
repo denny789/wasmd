@@ -29,22 +29,62 @@ func (c CodeInfo) ValidateBasic() error {
 	if err := validateBuilder(c.Builder); err != nil {
 		return sdkerrors.Wrap(err, "builder")
 	}
+	if err := c.InstantiateConfig.ValidateBasic(); err != nil {
+		return sdkerrors.Wrap(err, "instantiate config")
+	}
 	return nil
 }
 
 // NewCodeInfo fills a new Contract struct
-func NewCodeInfo(codeHash []byte, creator sdk.AccAddress, source string, builder string) CodeInfo {
+func NewCodeInfo(codeHash []byte, creator sdk.AccAddress, source string, builder string, instantiatePermission AccessConfig) CodeInfo {
 	return CodeInfo{
-		CodeHash: codeHash,
-		Creator:  creator,
-		Source:   source,
-		Builder:  builder,
+		CodeHash:          codeHash,
+		Creator:           creator,
+		Source:            source,
+		Builder:           builder,
+		InstantiateConfig: instantiatePermission,
 	}
 }
-func (c *ContractInfo) UpdateCodeID(ctx sdk.Context, newCodeID uint64) {
-	c.PreviousCodeID = c.CodeID
-	c.CodeID = newCodeID
-	c.LastUpdated = NewCreatedAt(ctx)
+
+
+type ContractCodeHistoryOperationType string
+
+const (
+	InitContractCodeHistoryType    ContractCodeHistoryOperationType = "Init"
+	MigrateContractCodeHistoryType ContractCodeHistoryOperationType = "Migrate"
+	GenesisContractCodeHistoryType ContractCodeHistoryOperationType = "Genesis"
+)
+
+var AllCodeHistoryTypes = []ContractCodeHistoryOperationType{InitContractCodeHistoryType, MigrateContractCodeHistoryType}
+
+// ContractCodeHistoryEntry stores code updates to a contract.
+type ContractCodeHistoryEntry struct {
+	Operation ContractCodeHistoryOperationType `json:"operation"`
+	CodeID    uint64                           `json:"code_id"`
+	Updated   *AbsoluteTxPosition              `json:"updated,omitempty"`
+	Msg       json.RawMessage                  `json:"msg,omitempty"`
+}
+
+// ContractInfo stores a WASM contract instance
+type ContractInfo struct {
+	CodeID  uint64         `json:"code_id"`
+	Creator sdk.AccAddress `json:"creator"`
+	Admin   sdk.AccAddress `json:"admin,omitempty"`
+	Label   string         `json:"label"`
+	// never show this in query results, just use for sorting
+	// (Note: when using json tag "-" amino refused to serialize it...)
+	Created *AbsoluteTxPosition `json:"created,omitempty"`
+}
+
+// NewContractInfo creates a new instance of a given WASM contract info
+func NewContractInfo(codeID uint64, creator, admin sdk.AccAddress, label string, createdAt *AbsoluteTxPosition) ContractInfo {
+	return ContractInfo{
+		CodeID:  codeID,
+		Creator: creator,
+		Admin:   admin,
+		Label:   label,
+		Created: createdAt,
+	}
 }
 
 func (c *ContractInfo) ValidateBasic() error {
@@ -62,17 +102,39 @@ func (c *ContractInfo) ValidateBasic() error {
 	if err := validateLabel(c.Label); err != nil {
 		return sdkerrors.Wrap(err, "label")
 	}
-	if c.Created == nil {
-		return sdkerrors.Wrap(ErrEmpty, "created")
-	}
-	if err := c.Created.ValidateBasic(); err != nil {
-		return sdkerrors.Wrap(err, "created")
-	}
-	if err := c.LastUpdated.ValidateBasic(); err != nil {
-		return sdkerrors.Wrap(err, "last updated")
-	}
 	return nil
 }
+
+func (c ContractInfo) InitialHistory(initMsg []byte) ContractCodeHistoryEntry {
+	return ContractCodeHistoryEntry{
+		Operation: InitContractCodeHistoryType,
+		CodeID:    c.CodeID,
+		Updated:   c.Created,
+		Msg:       initMsg,
+	}
+}
+
+func (c *ContractInfo) AddMigration(ctx sdk.Context, codeID uint64, msg []byte) ContractCodeHistoryEntry {
+	h := ContractCodeHistoryEntry{
+		Operation: MigrateContractCodeHistoryType,
+		CodeID:    codeID,
+		Updated:   NewAbsoluteTxPosition(ctx),
+		Msg:       msg,
+	}
+	c.CodeID = codeID
+	return h
+}
+
+// ResetFromGenesis resets contracts timestamp and history.
+func (c *ContractInfo) ResetFromGenesis(ctx sdk.Context) ContractCodeHistoryEntry {
+	c.Created = NewAbsoluteTxPosition(ctx)
+	return ContractCodeHistoryEntry{
+		Operation: GenesisContractCodeHistoryType,
+		CodeID:    c.CodeID,
+		Updated:   c.Created,
+	}
+}
+
 
 // LessThan can be used to sort
 func (a *AbsoluteTxPosition) LessThan(b *AbsoluteTxPosition) bool {
@@ -85,18 +147,8 @@ func (a *AbsoluteTxPosition) LessThan(b *AbsoluteTxPosition) bool {
 	return a.BlockHeight < b.BlockHeight || (a.BlockHeight == b.BlockHeight && a.TxIndex < b.TxIndex)
 }
 
-func (a *AbsoluteTxPosition) ValidateBasic() error {
-	if a == nil {
-		return nil
-	}
-	if a.BlockHeight < 0 {
-		return sdkerrors.Wrap(ErrInvalid, "height")
-	}
-	return nil
-}
-
-// NewCreatedAt gets a timestamp from the context
-func NewCreatedAt(ctx sdk.Context) *AbsoluteTxPosition {
+// NewAbsoluteTxPosition gets a timestamp from the context
+func NewAbsoluteTxPosition(ctx sdk.Context) *AbsoluteTxPosition {
 	// we must safely handle nil gas meters
 	var index uint64
 	meter := ctx.BlockGasMeter()
@@ -106,18 +158,6 @@ func NewCreatedAt(ctx sdk.Context) *AbsoluteTxPosition {
 	return &AbsoluteTxPosition{
 		BlockHeight: ctx.BlockHeight(),
 		TxIndex:     index,
-	}
-}
-
-// NewContractInfo creates a new instance of a given WASM contract info
-func NewContractInfo(codeID uint64, creator, admin sdk.AccAddress, initMsg []byte, label string, createdAt *AbsoluteTxPosition) ContractInfo {
-	return ContractInfo{
-		CodeID:  codeID,
-		Creator: creator,
-		Admin:   admin,
-		InitMsg: initMsg,
-		Label:   label,
-		Created: createdAt,
 	}
 }
 
@@ -137,11 +177,11 @@ func NewEnv(ctx sdk.Context, creator sdk.AccAddress, deposit sdk.Coins, contract
 			ChainID: ctx.ChainID(),
 		},
 		Message: wasmTypes.MessageInfo{
-			Sender:    wasmTypes.CanonicalAddress(creator),
+			Sender:    creator.String(),
 			SentFunds: NewWasmCoins(deposit),
 		},
 		Contract: wasmTypes.ContractInfo{
-			Address: wasmTypes.CanonicalAddress(contractAddr),
+			Address: contractAddr.String(),
 		},
 	}
 	return env

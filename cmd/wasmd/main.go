@@ -15,6 +15,7 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
@@ -35,9 +36,9 @@ func main() {
 	encodingConfig := app.MakeEncodingConfig()
 
 	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
+	config.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(app.Bech32PrefixValAddr, app.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
 	config.Seal()
 
 	initClientCtx := client.Context{}.
@@ -51,7 +52,7 @@ func main() {
 
 	cobra.EnableCommandSorting = false
 	rootCmd := &cobra.Command{
-		Use:   "wasmd",
+		Use:   version.ServerName,
 		Short: "Wasm Daemon (server)",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
@@ -113,17 +114,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 		panic(err)
 	}
 
-	return app.NewWasmApp(
-		logger, db, traceStore, true, skipUpgradeHeights,
-		cast.ToString(appOpts.Get(flags.FlagHome)),
-		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		baseapp.SetPruning(pruningOpts),
-		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
-		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
-		baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
-		baseapp.SetInterBlockCache(cache),
-		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
-	)
+	return app.NewWasmApp(logger, db, traceStore, true, skipUpgradeHeights, cast.ToString(appOpts.Get(flags.FlagHome)), cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), app.GetEnabledProposals(), baseapp.SetPruning(pruningOpts), baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))), baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))), baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))), baseapp.SetInterBlockCache(cache), baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))))
 }
 
 func exportAppStateAndTMValidators(
@@ -132,13 +123,13 @@ func exportAppStateAndTMValidators(
 
 	var wasmApp *app.WasmApp
 	if height != -1 {
-		wasmApp = app.NewWasmApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1))
+		wasmApp = app.NewWasmApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), app.GetEnabledProposals())
 
 		if err := wasmApp.LoadHeight(height); err != nil {
 			return nil, nil, nil, err
 		}
 	} else {
-		wasmApp = app.NewWasmApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1))
+		wasmApp = app.NewWasmApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), app.GetEnabledProposals())
 	}
 
 	return wasmApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)

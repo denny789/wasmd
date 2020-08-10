@@ -92,10 +92,7 @@ func replayTxs(rootDir string) error {
 
 	// Application
 	fmt.Fprintln(os.Stderr, "Creating application")
-	gapp := app.NewWasmApp(
-		ctx.Logger, appDB, traceStoreWriter, true, map[int64]bool{}, "", uint(1),
-		baseapp.SetPruning(storetypes.PruneEverything), // nothing
-	)
+	gapp := app.NewWasmApp(ctx.Logger, appDB, traceStoreWriter, true, map[int64]bool{}, "", uint(1), app.GetEnabledProposals(), baseapp.SetPruning(storetypes.PruneEverything))
 
 	// Genesis
 	var genDocPath = filepath.Join(configDir, "genesis.json")

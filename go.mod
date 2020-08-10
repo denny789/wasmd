@@ -3,8 +3,7 @@ module github.com/CosmWasm/wasmd
 go 1.14
 
 require (
-	// Note: update ENV GO_COSMWASM in Dockerfile when updating this
-	github.com/CosmWasm/go-cosmwasm v0.9.1
+	github.com/CosmWasm/go-cosmwasm v0.10.0
 	github.com/cosmos/cosmos-sdk v0.34.4-0.20200807102022-3322e269a184
 	github.com/dvsekhvalnov/jose2go v0.0.0-20180829124132-7f401d37b68a
 	github.com/gogo/protobuf v1.3.1

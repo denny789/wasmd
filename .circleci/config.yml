@@ -4,18 +4,7 @@ executors:
   golang:
     docker:
       - image: circleci/golang:1.14
-    working_directory: /go/src/github.com/CosmWasm/wasmd
-  mac:
-    macos:
-      xcode: "10.3.0"
-    working_directory: /Users/distiller/project/src/github.com/CosmWasm/wasmd
-    environment:
-      GO_VERSION: "1.14"
-  docs:
-    docker:
-      - image: tendermintdev/jq_curl
-    environment:
-      AWS_REGION: us-east-1
+    working_directory: /go/src/github.com/cosmwasm/wasmd
 
 commands:
   make:
@@ -41,15 +30,6 @@ commands:
           command: |
             export BINDIR=/tmp/bin
             make << parameters.target >>
-  mac_set_env:
-    steps:
-      - run:
-          name: "Set environment"
-          command: |
-            echo 'export PATH=$PATH:$HOME/go/bin' >> $BASH_ENV
-            echo 'export GOPATH=$HOME/project' >> $BASH_ENV
-            echo 'export PATH=$PATH:$HOME/go/bin:$GOPATH/bin' >> $BASH_ENV
-            echo 'export GO111MODULE=on'
 
 jobs:
   setup-dependencies:
@@ -69,10 +49,6 @@ jobs:
       - run:
           name: "Git garbage collection"
           command: git gc
-      - run:
-          name: "Build tools binaries"
-          command: |
-            make tools
       - save_cache:
           name: "Save go modules cache"
           key: go-mod-v1-{{ checksum "go.sum" }}
@@ -83,21 +59,6 @@ jobs:
           key: go-src-v1-{{ .Revision }}
           paths:
             - ".git"
-      - run:
-          command: |
-            mkdir -p /tmp/bin
-            cp -r /go/bin/* /tmp/bin
-      - persist_to_workspace:
-          root: "/tmp/bin"
-          paths:
-            - "."
-
-  test-sim-multi-seed-long:
-    executor: golang
-    steps:
-      - make:
-          target: test-sim-multi-seed-long
-          description: "Test Gaia multi-seed simulation (long-lived)"
 
   test-cover:
     executor: golang
@@ -154,33 +115,6 @@ jobs:
           name: upload
           command: bash <(curl -s https://codecov.io/bash) -f coverage.txt
 
-  localnet:
-    working_directory: /home/circleci/.go_workspace/src/github.com/CosmWasm/wasmd
-    machine:
-      image: circleci/classic:latest
-    environment:
-      GOPATH: /home/circleci/.go_workspace/
-      GOOS: linux
-      GOARCH: amd64
-      GO_VERSION: "1.14"
-    parallelism: 1
-    steps:
-      - checkout
-      - run:
-          name: Run a localnet and test liveness
-          command: |
-            pushd /tmp
-            wget https://dl.google.com/go/go$GO_VERSION.linux-amd64.tar.gz
-            sudo tar -xvf go$GO_VERSION.linux-amd64.tar.gz
-            sudo rm -rf /usr/local/go
-            sudo mv go /usr/local
-            popd
-            set -x
-            make clean localnet-start
-            ./contrib/localnet-blocks-test.sh 100 5 50 localhost
-
-
-
   docker-image:
     executor: golang
     steps:
@@ -218,45 +152,6 @@ jobs:
             docker push "cosmwasm/wasmd:${CIRCLE_TAG}"
             docker logout
 
-  reproducible-builds:
-    executor: golang
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: Build gaia
-          no_output_timeout: 20m
-          command: |
-            sudo apt-get install -y ruby
-            bash -x ./contrib/gitian-build.sh multi
-            cp gitian-build-multi/result/gaia-multi-res.yml .
-            rm -rf gitian-build-multi/
-      - store_artifacts:
-          path: /go/src/github.com/CosmWasm/wasmd/gaia-multi-res.yml
-
-# FIXME: The `setup-contract-tests-data` make target is broken as it completely
-# overrides the .wasmd directory.
-#
-#  contract_tests:
-#    executor: golang
-#    steps:
-#      - attach_workspace:
-#          at: /tmp/workspace
-#      - checkout
-#      - setup_remote_docker:
-#          docker_layer_caching: true
-#      - run:
-#          name: Get Node.js and test REST implementation against swagger documentation at  https://cosmos.network/rpc/
-#          command: |
-#            go get github.com/snikch/goodman/cmd/goodman
-#            make build
-#            make build-contract-tests-hooks
-#            make setup-contract-tests-data
-#            export PATH=~/.local/bin:$PATH
-#            ./contrib/get_node.sh && make contract-tests
-
 workflows:
   version: 2
   test-suite:
@@ -279,52 +174,15 @@ workflows:
                 - /.*/
           requires:
             - setup-dependencies
-      # - macos-ci:
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
-      # - deploy-docs:
-      #     context: gaia-docs-deployment-staging
-      #     filters:
-      #       branches:
-      #         only:
-      #           - docs-update
-      # - deploy-docs:
-      #     context: gaia-docs-deployment
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
       - setup-dependencies:
           # filters here are needed to enable this job also for tags
           filters:
             tags:
               only:
                 - /^v.*/
-      # - test-sim-multi-seed-long:
-      #     requires:
-      #       - setup-dependencies
-      #     # These filters ensure that the long sim only runs during release
-      #     filters:
-      #       branches:
-      #         ignore: /.*/
-      #       tags:
-      #         only:
-      #           - /^v.*/
       - test-cover:
           requires:
             - setup-dependencies
       - upload-coverage:
           requires:
             - test-cover
-      # - reproducible-builds:
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
-      #     requires:
-      #       - setup-dependencies
-#      - contract_tests:
-#          requires:
-#            - setup-dependencies

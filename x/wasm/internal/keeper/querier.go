@@ -20,6 +20,7 @@ const (
 	QueryGetContractState   = "contract-state"
 	QueryGetCode            = "code"
 	QueryListCode           = "list-code"
+	QueryContractHistory    = "contract-history"
 )
 
 const (
@@ -64,6 +65,8 @@ func NewLegacyQuerier(keeper Keeper) sdk.Querier {
 			rsp, err = queryCode(ctx, codeID, keeper)
 		case QueryListCode:
 			rsp, err = queryCodeList(ctx, keeper)
+		case QueryContractHistory:
+			rsp, err = queryContractHistory(ctx, path[1], keeper)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown data query endpoint")
 		}
@@ -205,9 +208,6 @@ func queryContractInfo(ctx sdk.Context, addr sdk.AccAddress, keeper Keeper) (*ty
 	}
 	// redact the Created field (just used for sorting, not part of public API)
 	info.Created = nil
-	info.LastUpdated = nil
-	info.PreviousCodeID = 0
-
 	return &types.ContractInfoWithAddress{
 		Address:      addr,
 		ContractInfo: info,
@@ -216,10 +216,8 @@ func queryContractInfo(ctx sdk.Context, addr sdk.AccAddress, keeper Keeper) (*ty
 
 func queryContractListByCode(ctx sdk.Context, codeID uint64, keeper Keeper) ([]types.ContractInfoWithAddress, error) {
 	var contracts []types.ContractInfoWithAddress
-	keeper.ListContractInfo(ctx, func(addr sdk.AccAddress, info types.ContractInfo) bool {
+	keeper.IterateContractInfo(ctx, func(addr sdk.AccAddress, info types.ContractInfo) bool {
 		if info.CodeID == codeID {
-			// remove init message on list
-			info.InitMsg = nil
 			// and add the address
 			infoWithAddress := types.ContractInfoWithAddress{
 				Address:      addr,
@@ -264,6 +262,8 @@ func queryContractState(ctx sdk.Context, bech, queryMethod string, data []byte, 
 		// this returns a serialized json object
 		resultData = keeper.QueryRaw(ctx, contractAddr, data)
 	case QueryMethodContractStateSmart:
+		// we enforce a subjective gas limit on all queries to avoid infinite loops
+		ctx = ctx.WithGasMeter(sdk.NewGasMeter(keeper.queryGasLimit))
 		// this returns raw bytes (must be base64-encoded)
 		return keeper.QuerySmart(ctx, contractAddr, data)
 	default:
@@ -303,13 +303,7 @@ func queryCode(ctx sdk.Context, codeID uint64, keeper Keeper) (*types.QueryCodeR
 
 func queryCodeList(ctx sdk.Context, keeper Keeper) ([]types.CodeInfoResponse, error) {
 	var info []types.CodeInfoResponse
-	var i uint64
-	for true {
-		i++ // todo: revisit as code IDs can contain gaps now. Better use DB iterator
-		res := keeper.GetCodeInfo(ctx, i)
-		if res == nil {
-			break
-		}
+	keeper.IterateCodeInfos(ctx, func(i uint64, res types.CodeInfo) bool {
 		info = append(info, types.CodeInfoResponse{
 			CodeID:   i,
 			Creator:  res.Creator,
@@ -317,7 +311,24 @@ func queryCodeList(ctx sdk.Context, keeper Keeper) ([]types.CodeInfoResponse, er
 			Source:   res.Source,
 			Builder:  res.Builder,
 		})
-	}
-
+		return false
+	})
 	return info, nil
+}
+
+func queryContractHistory(ctx sdk.Context, bech string, keeper Keeper) ([]types.ContractCodeHistoryEntry, error) {
+	contractAddr, err := sdk.AccAddressFromBech32(bech)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, err.Error())
+	}
+	entries := keeper.GetContractHistory(ctx, contractAddr)
+	if entries == nil {
+		// nil, nil leads to 404 in rest handler
+		return nil, nil
+	}
+	// redact response
+	for i := range entries {
+		entries[i].Updated = nil
+	}
+	return entries, nil
 }

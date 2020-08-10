@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/magiconair/properties/assert"
 	"os"
 	"testing"
 
@@ -12,16 +13,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/CosmWasm/wasmd/x/wasm"
 )
 
 func TestWasmdExport(t *testing.T) {
 	db := db.NewMemDB()
-	gapp := NewWasmApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, "", 0)
+	gapp := NewWasmApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, "", 0, wasm.EnableAllProposals, wasm.EnableAllProposals)
 	err := setGenesis(gapp)
 	require.NoError(t, err)
 
 	// Making a new app object with the db, so that initchain hasn't been called
-	newGapp := NewWasmApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, "", 0)
+	newGapp := NewWasmApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, "", 0, wasm.EnableAllProposals)
 	_, _, _, err = newGapp.ExportAppStateAndValidators(false, []string{})
 	require.NoError(t, err, "ExportAppStateAndValidators should not have an error")
 }
@@ -29,7 +31,7 @@ func TestWasmdExport(t *testing.T) {
 // ensure that black listed addresses are properly set in bank keeper
 func TestBlackListedAddrs(t *testing.T) {
 	db := db.NewMemDB()
-	gapp := NewWasmApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, "", 0)
+	gapp := NewWasmApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, "", 0, wasm.EnableAllProposals)
 
 	for acc := range maccPerms {
 		require.Equal(t, !allowedReceivingModAcc[acc], gapp.bankKeeper.BlockedAddr(gapp.accountKeeper.GetModuleAddress(acc)))
@@ -39,6 +41,37 @@ func TestBlackListedAddrs(t *testing.T) {
 func TestGetMaccPerms(t *testing.T) {
 	dup := GetMaccPerms()
 	require.Equal(t, maccPerms, dup, "duplicated module account permissions differed from actual module account permissions")
+}
+
+func TestGetEnabledProposals(t *testing.T) {
+	cases := map[string]struct {
+		proposalsEnabled string
+		specificEnabled  string
+		expected         []wasm.ProposalType
+	}{
+		"all disabled": {
+			proposalsEnabled: "false",
+			expected:         wasm.DisableAllProposals,
+		},
+		"all enabled": {
+			proposalsEnabled: "true",
+			expected:         wasm.EnableAllProposals,
+		},
+		"some enabled": {
+			proposalsEnabled: "okay",
+			specificEnabled:  "StoreCode,InstantiateContract",
+			expected:         []wasm.ProposalType{wasm.ProposalTypeStoreCode, wasm.ProposalTypeInstantiateContract},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			ProposalsEnabled = tc.proposalsEnabled
+			EnableSpecificProposals = tc.specificEnabled
+			proposals := GetEnabledProposals()
+			assert.Equal(t, tc.expected, proposals)
+		})
+	}
 }
 
 func setGenesis(gapp *WasmApp) error {

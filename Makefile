@@ -60,7 +60,38 @@ endif
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
-BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)' -trimpath
+coral_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=coral \
+				  -X github.com/cosmos/cosmos-sdk/version.ServerName=corald \
+				  -X github.com/cosmos/cosmos-sdk/version.ClientName=coral \
+				  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+				  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+				  -X github.com/CosmWasm/wasmd/app.CLIDir=.coral \
+				  -X github.com/CosmWasm/wasmd/app.NodeDir=.corald \
+				  -X github.com/CosmWasm/wasmd/app.Bech32Prefix=coral \
+				  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
+# we could consider enabling governance override?
+#				  -X github.com/CosmWasm/wasmd/app.EnableSpecificProposals=MigrateContract,UpdateAdmin,ClearAdmin \
+
+coral_ldflags += $(LDFLAGS)
+coral_ldflags := $(strip $(coral_ldflags))
+
+flex_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=gaiaflex \
+				  -X github.com/cosmos/cosmos-sdk/version.ServerName=gaiaflexd \
+				  -X github.com/cosmos/cosmos-sdk/version.ClientName=gaiaflex \
+				  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+				  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+				  -X github.com/CosmWasm/wasmd/app.ProposalsEnabled=true \
+				  -X github.com/CosmWasm/wasmd/app.CLIDir=.gaiaflex \
+				  -X github.com/CosmWasm/wasmd/app.NodeDir=.gaiaflexd \
+				  -X github.com/CosmWasm/wasmd/app.Bech32Prefix=cosmos \
+				  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
+
+flex_ldflags += $(LDFLAGS)
+flex_ldflags := $(strip $(flex_ldflags))
+
+BUILD_FLAGS := -tags $(build_tags) -ldflags '$(ldflags)' -trimpath
+CORAL_BUILD_FLAGS := -tags $(build_tags) -ldflags '$(coral_ldflags)' -trimpath
+FLEX_BUILD_FLAGS := -tags $(build_tags) -ldflags '$(flex_ldflags)' -trimpath
 
 # The below include contains the tools target.
 include contrib/devtools/Makefile
@@ -69,11 +100,29 @@ all: install lint test
 
 build: go.sum
 ifeq ($(OS),Windows_NT)
-	go build -mod=readonly $(BUILD_FLAGS) -o build/wasmd.exe ./cmd/wasmd
+	# wasmd nodes not supported on windows, maybe the cli?
 	go build -mod=readonly $(BUILD_FLAGS) -o build/wasmcli.exe ./cmd/wasmcli
 else
 	go build -mod=readonly $(BUILD_FLAGS) -o build/wasmd ./cmd/wasmd
 	go build -mod=readonly $(BUILD_FLAGS) -o build/wasmcli ./cmd/wasmcli
+endif
+
+build-coral: go.sum
+ifeq ($(OS),Windows_NT)
+	# wasmd nodes not supported on windows, maybe the cli?
+	go build -mod=readonly $(CORAL_BUILD_FLAGS) -o build/coral.exe ./cmd/wasmcli
+else
+	go build -mod=readonly $(CORAL_BUILD_FLAGS) -o build/corald ./cmd/wasmd
+	go build -mod=readonly $(CORAL_BUILD_FLAGS) -o build/coral ./cmd/wasmcli
+endif
+
+build-gaiaflex: go.sum
+ifeq ($(OS),Windows_NT)
+	# wasmd nodes not supported on windows, maybe the cli?
+	go build -mod=readonly $(FLEX_BUILD_FLAGS) -o build/gaiaflex.exe ./cmd/wasmcli
+else
+	go build -mod=readonly $(FLEX_BUILD_FLAGS) -o build/gaiaflexd ./cmd/wasmd
+	go build -mod=readonly $(FLEX_BUILD_FLAGS) -o build/gaiaflex ./cmd/wasmcli
 endif
 
 build-linux: go.sum
@@ -89,6 +138,9 @@ endif
 install: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/wasmd
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/wasmcli
+
+########################################
+### Tools & dependencies
 
 go-mod-cache: go.sum
 	@echo "--> Download go modules to local cache"
@@ -110,31 +162,8 @@ distclean: clean
 	rm -rf vendor/
 
 ###############################################################################
-###                                 Devdoc                                  ###
-###############################################################################
-
-build-docs:
-	@cd docs && \
-	while read p; do \
-		(git checkout $${p} && npm install && VUEPRESS_BASE="/$${p}/" npm run build) ; \
-		mkdir -p ~/output/$${p} ; \
-		cp -r .vuepress/dist/* ~/output/$${p}/ ; \
-		cp ~/output/$${p}/index.html ~/output ; \
-	done < versions ;
-
-sync-docs:
-	cd ~/output && \
-	echo "role_arn = ${DEPLOYMENT_ROLE_ARN}" >> /root/.aws/config ; \
-	echo "CI job = ${CIRCLE_BUILD_URL}" >> version.html ; \
-	aws s3 sync . s3://${WEBSITE_BUCKET} --profile terraform --delete ; \
-	aws cloudfront create-invalidation --distribution-id ${CF_DISTRIBUTION_ID} --profile terraform --path "/*" ;
-.PHONY: sync-docs
-
-
-###############################################################################
 ###                           Tests & Simulation                            ###
 ###############################################################################
-
 include sims.mk
 
 test: test-unit test-build
@@ -151,7 +180,7 @@ test-cover:
 	@go test -mod=readonly -timeout 30m -race -coverprofile=coverage.txt -covermode=atomic -tags='ledger test_ledger_mock' ./...
 
 test-build: build
-#	@go test -mod=readonly -p 4 `go list ./cli_test/...` -tags=cli_test -v
+	@go test -mod=readonly -p 4 `go list ./cli_test/...` -tags=cli_test -v
 
 benchmark:
 	@go test -mod=readonly -bench=. ./...
@@ -186,53 +215,7 @@ proto-lint:
 proto-check-breaking:
 	@buf check breaking --against-input '.git#branch=master'
 
-TM_URL           = https://raw.githubusercontent.com/tendermint/tendermint/v0.33.1
-GOGO_PROTO_URL   = https://raw.githubusercontent.com/regen-network/protobuf/cosmosSDK_PROTO_TYPES     = third_party/proto/cosmos-sdk/types
-COSMOS_PROTO_URL = https://raw.githubusercontent.com/regen-network/cosmos-proto/master
 
-###############################################################################
-###                                Localnet                                 ###
-###############################################################################
-
-build-docker-wasmdnode:
-	$(MAKE) -C networks/local
-
-# Run a 4-node testnet locally
-localnet-start: build-linux localnet-stop
-	@if ! [ -f build/node0/wasmd/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/wasmd:Z tendermint/wasmdnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 ; fi
-	docker-compose up -d
-
-# Stop testnet
-localnet-stop:
-	docker-compose down
-
-setup-contract-tests-data:
-	echo 'Prepare data for the contract tests'
-	rm -rf /tmp/contract_tests ; \
-	mkdir /tmp/contract_tests ; \
-	cp "${GOPATH}/pkg/mod/${SDK_PACK}/client/lcd/swagger-ui/swagger.yaml" /tmp/contract_tests/swagger.yaml ; \
-	./build/wasmd init --home /tmp/contract_tests/.wasmd --chain-id lcd contract-tests ; \
-	tar -xzf lcd_test/testdata/state.tar.gz -C /tmp/contract_tests/
-
-start-gaia: setup-contract-tests-data
-	./build/wasmd --home /tmp/contract_tests/.wasmd start &
-	@sleep 2s
-
-setup-transactions: start-gaia
-	@bash ./lcd_test/testdata/setup.sh
-
-run-lcd-contract-tests:
-	@echo "Running Gaia LCD for contract tests"
-	./build/wasmcli rest-server --laddr tcp://0.0.0.0:8080 --home /tmp/contract_tests/.wasmcli --node http://localhost:26657 --chain-id lcd --trust-node true
-
-contract-tests: setup-transactions
-	@echo "Running Gaia LCD for contract tests"
-	dredd && pkill wasmd
-
-.PHONY: all build-linux install format lint \
-	go-mod-cache draw-deps clean build \
-	setup-transactions setup-contract-tests-data start-gaia run-lcd-contract-tests contract-tests \
-	test test-all test-build test-cover test-unit test-race \
-	benchmark \
-	build-docker-gaiadnode localnet-start localnet-stop \
-	docker-single-node
+.PHONY: all build-linux install install-debug \
+	go-mod-cache draw-deps clean build format \
+	test test-all test-build test-cover test-unit test-race

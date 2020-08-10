@@ -37,6 +37,13 @@ Ref: https://keepachangelog.com/en/1.0.0/
 ## [Unreleased]
 
 ### Features
+* (wasmd) [\#196](https://github.com/CosmWasm/wasmd/issues/196) Move history of contract code migrations to their own prefix store
+* (wasmd) [\#130](https://github.com/CosmWasm/wasmd/issues/130) Full history of contract code migrations
+* (wasmd) [\#187](https://github.com/CosmWasm/wasmd/issues/187) Introduce wasmgovd binary
+* (wasmd) [\#178](https://github.com/CosmWasm/wasmd/issues/178) Add cli support for wasm gov proposals
+* (wasmd) [\#163](https://github.com/CosmWasm/wasmd/issues/163) Control who can instantiate code
+* (wasmd) [\#164](https://github.com/CosmWasm/wasmd/issues/164) Control who can upload code
+* (wasmd) [\#173](https://github.com/CosmWasm/wasmd/issues/173) Gov proposal types and handler
 * (wasmd) [\#122](https://github.com/CosmWasm/wasmd/pull/122]) Migrate contract backend functionality with go-cosmwasm stub impl
 * (wasmd)[\#2](https://github.com/CosmWasm/wasmd/pull/22)  Improve wasm contract queries (all, raw, smart)
 * (wasmd) [\#119](https://github.com/CosmWasm/wasmd/pull/119) Add support for the `--inter-block-cache` CLI

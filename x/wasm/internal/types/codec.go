@@ -9,12 +9,18 @@ import (
 
 // RegisterCodec registers the account types and interface
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(&MsgStoreCode{}, "wasm/store-code", nil)
-	cdc.RegisterConcrete(&MsgInstantiateContract{}, "wasm/instantiate", nil)
-	cdc.RegisterConcrete(&MsgExecuteContract{}, "wasm/execute", nil)
-	cdc.RegisterConcrete(&MsgMigrateContract{}, "wasm/migrate", nil)
-	cdc.RegisterConcrete(&MsgUpdateAdmin{}, "wasm/update-contract-admin", nil)
-	cdc.RegisterConcrete(&MsgClearAdmin{}, "wasm/clear-contract-admin", nil)
+	cdc.RegisterConcrete(MsgStoreCode{}, "wasm/MsgStoreCode", nil)
+	cdc.RegisterConcrete(MsgInstantiateContract{}, "wasm/MsgInstantiateContract", nil)
+	cdc.RegisterConcrete(MsgExecuteContract{}, "wasm/MsgExecuteContract", nil)
+	cdc.RegisterConcrete(MsgMigrateContract{}, "wasm/MsgMigrateContract", nil)
+	cdc.RegisterConcrete(MsgUpdateAdmin{}, "wasm/MsgUpdateAdmin", nil)
+	cdc.RegisterConcrete(MsgClearAdmin{}, "wasm/MsgClearAdmin", nil)
+
+	cdc.RegisterConcrete(StoreCodeProposal{}, "wasm/StoreCodeProposal", nil)
+	cdc.RegisterConcrete(InstantiateContractProposal{}, "wasm/InstantiateContractProposal", nil)
+	cdc.RegisterConcrete(MigrateContractProposal{}, "wasm/MigrateContractProposal", nil)
+	cdc.RegisterConcrete(UpdateAdminProposal{}, "wasm/UpdateAdminProposal", nil)
+	cdc.RegisterConcrete(ClearAdminProposal{}, "wasm/ClearAdminProposal", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
