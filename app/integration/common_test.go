@@ -12,7 +12,7 @@ import (
 	"time"
 
 	wasmd "github.com/CosmWasm/wasmd/app"
-    "github.com/CosmWasm/wasmd/x/wasm"
+	"github.com/CosmWasm/wasmd/x/wasm"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"

@@ -25,65 +25,64 @@ func TestValidateParams(t *testing.T) {
 		"all good with nobody": {
 			src: Params{
 				CodeUploadAccess:             AllowNobody,
-				InstantiateDefaultPermission: Nobody,
+				InstantiateDefaultPermission: AccessTypeNobody,
 			},
 		},
 		"all good with everybody": {
 			src: Params{
 				CodeUploadAccess:             AllowEverybody,
-				InstantiateDefaultPermission: Everybody,
+				InstantiateDefaultPermission: AccessTypeEverybody,
 			},
 		},
 		"all good with only address": {
 			src: Params{
-				CodeUploadAccess:             OnlyAddress.With(anyAddress),
-				InstantiateDefaultPermission: OnlyAddress,
+				CodeUploadAccess:             AccessTypeOnlyAddress.With(anyAddress),
+				InstantiateDefaultPermission: AccessTypeOnlyAddress,
 			},
 		},
 		"reject empty type in instantiate permission": {
 			src: Params{
-				CodeUploadAccess:             AllowNobody,
-				InstantiateDefaultPermission: "",
+				CodeUploadAccess: AllowNobody,
 			},
 			expErr: true,
 		},
 		"reject unknown type in instantiate": {
 			src: Params{
 				CodeUploadAccess:             AllowNobody,
-				InstantiateDefaultPermission: "Undefined",
+				InstantiateDefaultPermission: 1111,
 			},
 			expErr: true,
 		},
 		"reject invalid address in only address": {
 			src: Params{
-				CodeUploadAccess:             AccessConfig{Type: OnlyAddress, Address: invalidAddress},
-				InstantiateDefaultPermission: OnlyAddress,
+				CodeUploadAccess:             AccessConfig{Type: AccessTypeOnlyAddress, Address: invalidAddress},
+				InstantiateDefaultPermission: AccessTypeOnlyAddress,
 			},
 			expErr: true,
 		},
 		"reject CodeUploadAccess Everybody with obsolete address": {
 			src: Params{
-				CodeUploadAccess:             AccessConfig{Type: Everybody, Address: anyAddress},
-				InstantiateDefaultPermission: OnlyAddress,
+				CodeUploadAccess:             AccessConfig{Type: AccessTypeEverybody, Address: anyAddress},
+				InstantiateDefaultPermission: AccessTypeOnlyAddress,
 			},
 			expErr: true,
 		},
 		"reject CodeUploadAccess Nobody with obsolete address": {
 			src: Params{
-				CodeUploadAccess:             AccessConfig{Type: Nobody, Address: anyAddress},
-				InstantiateDefaultPermission: OnlyAddress,
+				CodeUploadAccess:             AccessConfig{Type: AccessTypeNobody, Address: anyAddress},
+				InstantiateDefaultPermission: AccessTypeOnlyAddress,
 			},
 			expErr: true,
 		},
 		"reject empty CodeUploadAccess": {
 			src: Params{
-				InstantiateDefaultPermission: OnlyAddress,
+				InstantiateDefaultPermission: AccessTypeOnlyAddress,
 			},
 			expErr: true,
 		}, "reject undefined permission in CodeUploadAccess": {
 			src: Params{
-				CodeUploadAccess:             AccessConfig{Type: Undefined},
-				InstantiateDefaultPermission: OnlyAddress,
+				CodeUploadAccess:             AccessConfig{Type: AccessTypeUndefined},
+				InstantiateDefaultPermission: AccessTypeOnlyAddress,
 			},
 			expErr: true,
 		},
@@ -105,11 +104,11 @@ func TestAccessTypeMarshalJson(t *testing.T) {
 		src AccessType
 		exp string
 	}{
-		"Undefined":   {src: Undefined, exp: `"Undefined"`},
-		"Nobody":      {src: Nobody, exp: `"Nobody"`},
-		"OnlyAddress": {src: OnlyAddress, exp: `"OnlyAddress"`},
-		"Everybody":   {src: Everybody, exp: `"Everybody"`},
-		"unknown":     {src: "", exp: `"Undefined"`},
+		"Undefined":   {src: AccessTypeUndefined, exp: `"Undefined"`},
+		"Nobody":      {src: AccessTypeNobody, exp: `"Nobody"`},
+		"OnlyAddress": {src: AccessTypeOnlyAddress, exp: `"OnlyAddress"`},
+		"Everybody":   {src: AccessTypeEverybody, exp: `"Everybody"`},
+		"unknown":     {src: 999, exp: `"Undefined"`},
 	}
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {
@@ -124,11 +123,11 @@ func TestAccessTypeUnMarshalJson(t *testing.T) {
 		src string
 		exp AccessType
 	}{
-		"Undefined":   {src: `"Undefined"`, exp: Undefined},
-		"Nobody":      {src: `"Nobody"`, exp: Nobody},
-		"OnlyAddress": {src: `"OnlyAddress"`, exp: OnlyAddress},
-		"Everybody":   {src: `"Everybody"`, exp: Everybody},
-		"unknown":     {src: `""`, exp: Undefined},
+		"Undefined":   {src: `"Undefined"`, exp: AccessTypeUndefined},
+		"Nobody":      {src: `"Nobody"`, exp: AccessTypeNobody},
+		"OnlyAddress": {src: `"OnlyAddress"`, exp: AccessTypeOnlyAddress},
+		"Everybody":   {src: `"Everybody"`, exp: AccessTypeEverybody},
+		"unknown":     {src: `""`, exp: AccessTypeUndefined},
 	}
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {

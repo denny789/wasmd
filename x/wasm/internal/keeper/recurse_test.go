@@ -56,7 +56,7 @@ func initRecurseContract(t *testing.T) (contract sdk.AccAddress, creator sdk.Acc
 	realWasmQuerier = WasmQuerier(&keeper)
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
-	creator = createFakeFundedAccount(ctx, accKeeper, deposit.Add(deposit...))
+	creator = createFakeFundedAccount(t, ctx, accKeeper, bankKeeper, deposit.Add(deposit...))
 
 	// store the code
 	wasmCode, err := ioutil.ReadFile("./testdata/contract.wasm")
@@ -227,12 +227,12 @@ func TestGasOnExternalQuery(t *testing.T) {
 			if tc.expectPanic {
 				require.Panics(t, func() {
 					// this should run out of gas
-					_, err := NewQuerier(keeper)(ctx, path, req)
+					_, err := NewLegacyQuerier(keeper)(ctx, path, req)
 					t.Logf("%v", err)
 				})
 			} else {
 				// otherwise, make sure we get a good success
-				_, err := NewQuerier(keeper)(ctx, path, req)
+				_, err := NewLegacyQuerier(keeper)(ctx, path, req)
 				require.NoError(t, err)
 			}
 		})

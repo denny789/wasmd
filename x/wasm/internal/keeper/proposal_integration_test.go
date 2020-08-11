@@ -37,7 +37,7 @@ func TestStoreCodeProposal(t *testing.T) {
 	})
 
 	// when stored
-	storedProposal, err := govKeeper.SubmitProposal(ctx, &src)
+	storedProposal, err := govKeeper.SubmitProposal(ctx, src)
 	require.NoError(t, err)
 
 	// and proposal execute
@@ -86,7 +86,7 @@ func TestInstantiateProposal(t *testing.T) {
 	})
 
 	// when stored
-	storedProposal, err := govKeeper.SubmitProposal(ctx, &src)
+	storedProposal, err := govKeeper.SubmitProposal(ctx, src)
 	require.NoError(t, err)
 
 	// and proposal execute

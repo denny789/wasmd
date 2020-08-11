@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strings"
 
@@ -114,6 +115,27 @@ func (p StoreCodeProposal) String() string {
 `, p.Title, p.Description, p.RunAs, p.WASMByteCode, p.Source, p.Builder)
 }
 
+// MarshalYAML pretty prints the wasm byte code
+func (p StoreCodeProposal) MarshalYAML() (interface{}, error) {
+	return struct {
+		Title                 string         `yaml:"title"`
+		Description           string         `yaml:"description"`
+		RunAs                 sdk.AccAddress `yaml:"run_as"`
+		WASMByteCode          string         `yaml:"wasm_byte_code"`
+		Source                string         `yaml:"source"`
+		Builder               string         `yaml:"builder"`
+		InstantiatePermission *AccessConfig  `yaml:"instantiate_permission"`
+	}{
+		Title:                 p.Title,
+		Description:           p.Description,
+		RunAs:                 p.RunAs,
+		WASMByteCode:          base64.StdEncoding.EncodeToString(p.WASMByteCode),
+		Source:                p.Source,
+		Builder:               p.Builder,
+		InstantiatePermission: p.InstantiatePermission,
+	}, nil
+}
+
 // ProposalRoute returns the routing key of a parameter change proposal.
 func (p InstantiateContractProposal) ProposalRoute() string { return RouterKey }
 
@@ -172,6 +194,29 @@ func (p InstantiateContractProposal) String() string {
 `, p.Title, p.Description, p.RunAs, p.Admin, p.CodeID, p.Label, p.InitMsg, p.InitFunds)
 }
 
+// MarshalYAML pretty prints the init message
+func (p InstantiateContractProposal) MarshalYAML() (interface{}, error) {
+	return struct {
+		Title       string         `yaml:"title"`
+		Description string         `yaml:"description"`
+		RunAs       sdk.AccAddress `yaml:"run_as"`
+		Admin       sdk.AccAddress `yaml:"admin"`
+		CodeID      uint64         `yaml:"code_id"`
+		Label       string         `yaml:"label"`
+		InitMsg     string         `yaml:"init_msg"`
+		InitFunds   sdk.Coins      `yaml:"init_funds"`
+	}{
+		Title:       p.Title,
+		Description: p.Description,
+		RunAs:       p.RunAs,
+		Admin:       p.Admin,
+		CodeID:      p.CodeID,
+		Label:       p.Label,
+		InitMsg:     string(p.InitMsg),
+		InitFunds:   p.InitFunds,
+	}, nil
+}
+
 // ProposalRoute returns the routing key of a parameter change proposal.
 func (p MigrateContractProposal) ProposalRoute() string { return RouterKey }
 
@@ -211,6 +256,25 @@ func (p MigrateContractProposal) String() string {
   Run as:      %s
   MigrateMsg   %q
 `, p.Title, p.Description, p.Contract, p.CodeID, p.RunAs, p.MigrateMsg)
+}
+
+// MarshalYAML pretty prints the migrate message
+func (p MigrateContractProposal) MarshalYAML() (interface{}, error) {
+	return struct {
+		Title       string         `yaml:"title"`
+		Description string         `yaml:"description"`
+		Contract    sdk.AccAddress `yaml:"contract"`
+		CodeID      uint64         `yaml:"code_id"`
+		MigrateMsg  string         `yaml:"msg"`
+		RunAs       sdk.AccAddress `yaml:"run_as"`
+	}{
+		Title:       p.Title,
+		Description: p.Description,
+		Contract:    p.Contract,
+		CodeID:      p.CodeID,
+		MigrateMsg:  string(p.MigrateMsg),
+		RunAs:       p.RunAs,
+	}, nil
 }
 
 // ProposalRoute returns the routing key of a parameter change proposal.

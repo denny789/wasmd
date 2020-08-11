@@ -135,7 +135,6 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 	paramsKeeper.Subspace(minttypes.ModuleName)
 	paramsKeeper.Subspace(distributiontypes.ModuleName)
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
-	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 
 	maccPerms := map[string][]string{ // module account permissions
@@ -201,7 +200,7 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 	wasmConfig := wasmTypes.DefaultWasmConfig()
 
 	keeper := NewKeeper(appCodec, keyWasm, paramsKeeper.Subspace(wasmtypes.DefaultParamspace), authKeeper, bankKeeper, stakingKeeper, router, tempDir, wasmConfig, supportedFeatures, encoders, queriers)
-
+	keeper.setParams(ctx, wasmtypes.DefaultParams())
 	// add wasm handler so we can loop-back (contracts calling contracts)
 	router.AddRoute(sdk.NewRoute(wasmTypes.RouterKey, TestHandler(keeper)))
 

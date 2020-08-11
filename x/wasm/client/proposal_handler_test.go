@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/internal/types"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	authvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting"
-	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/CosmWasm/wasmd/app"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/simapp"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 )
@@ -31,8 +31,15 @@ func TestGovRestHandlers(t *testing.T) {
 			"fees":           []dict{{"denom": "ustake", "amount": "1000000"}},
 		}
 	)
-	cdc := MakeCodec()
-	clientCtx := context.CLIContext{}.WithChainID("testing").WithCodec(cdc)
+	encodingConfig := simapp.MakeEncodingConfig()
+	clientCtx := client.Context{}.
+		WithJSONMarshaler(encodingConfig.Marshaler).
+		WithTxConfig(encodingConfig.TxConfig).
+		WithCodec(encodingConfig.Amino).
+		WithInput(os.Stdin).
+		WithAccountRetriever(authtypes.NewAccountRetriever(encodingConfig.Marshaler)).
+		WithBroadcastMode(flags.BroadcastBlock).
+		WithHomeDir(app.DefaultCLIHome).WithChainID("testing")
 
 	// router setup as in gov/client/rest/tx.go
 	propSubRtr := mux.NewRouter().PathPrefix("/gov/proposals").Subrouter()
@@ -218,17 +225,4 @@ func TestGovRestHandlers(t *testing.T) {
 			require.Equal(t, spec.expCode, w.Code, w.Body.String())
 		})
 	}
-}
-
-func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	wasmtypes.RegisterCodec(cdc)
-	gov.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
-	codec.RegisterEvidences(cdc)
-	authvesting.RegisterCodec(cdc)
-
-	return cdc.Seal()
-
 }

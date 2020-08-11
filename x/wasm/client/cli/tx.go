@@ -184,7 +184,6 @@ func parseInstantiateArgs(args []string, cliCtx client.Context) (types.MsgInstan
 	return msg, nil
 }
 
-
 // ExecuteContractCmd will instantiate a contract from previously uploaded code.
 func ExecuteContractCmd() *cobra.Command {
 	cmd := &cobra.Command{

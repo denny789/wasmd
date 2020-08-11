@@ -46,11 +46,9 @@ func NewCodeInfo(codeHash []byte, creator sdk.AccAddress, source string, builder
 	}
 }
 
-
 var AllCodeHistoryTypes = []ContractCodeHistoryOperationType{ContractCodeHistoryTypeGenesis, ContractCodeHistoryTypeInit, ContractCodeHistoryTypeMigrate}
 
-
-func (c *ContractHistory) AppendCodeHistory(newEntries ...ContractCodeHistoryEntry){
+func (c *ContractHistory) AppendCodeHistory(newEntries ...ContractCodeHistoryEntry) {
 	c.CodeHistoryEntries = append(c.CodeHistoryEntries, newEntries...)
 }
 

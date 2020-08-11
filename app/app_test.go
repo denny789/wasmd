@@ -12,8 +12,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp"
 
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/CosmWasm/wasmd/x/wasm"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func TestWasmdExport(t *testing.T) {

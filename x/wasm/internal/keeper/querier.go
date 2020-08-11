@@ -321,14 +321,14 @@ func queryContractHistory(ctx sdk.Context, bech string, keeper Keeper) ([]types.
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, err.Error())
 	}
-	entries := keeper.GetContractHistory(ctx, contractAddr)
-	if entries == nil {
+	history := keeper.GetContractHistory(ctx, contractAddr)
+	if history.CodeHistoryEntries == nil {
 		// nil, nil leads to 404 in rest handler
 		return nil, nil
 	}
 	// redact response
-	for i := range entries {
-		entries[i].Updated = nil
+	for i := range history.CodeHistoryEntries {
+		history.CodeHistoryEntries[i].Updated = nil
 	}
-	return entries, nil
+	return history.CodeHistoryEntries, nil
 }

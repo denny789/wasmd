@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -230,7 +230,7 @@ type WasmWrapper struct {
 // NewWasmApp returns a reference to an initialized WasmApp.
 func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	skipUpgradeHeights map[int64]bool, homeDir string, invCheckPeriod uint, enabledProposals []wasm.ProposalType,
-	baseAppOptions ...func(*bam.BaseApp), ) *WasmApp {
+	baseAppOptions ...func(*bam.BaseApp)) *WasmApp {
 
 	encodingConfig := MakeEncodingConfig()
 	appCodec, cdc := encodingConfig.Marshaler, encodingConfig.Amino
