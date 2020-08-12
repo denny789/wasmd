@@ -14,7 +14,7 @@ type EncodingConfig struct {
 	InterfaceRegistry types.InterfaceRegistry
 	Marshaler         codec.Marshaler
 	TxConfig          client.TxConfig
-	Amino             *codec.Codec
+	Amino             *codec.LegacyAmino
 }
 
 func MakeEncodingConfig() EncodingConfig {

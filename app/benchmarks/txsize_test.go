@@ -30,7 +30,7 @@ func ExampleTxSendSize() {
 	}
 	fee := authtypes.NewStdFee(gas, coins)
 	signBytes := authtypes.StdSignBytes("example-chain-ID",
-		1, 1, fee, []sdk.Msg{&msg1}, "")
+		1, 1, 100, fee, []sdk.Msg{&msg1}, "")
 	sig, err := priv1.Sign(signBytes)
 	if err != nil {
 		return

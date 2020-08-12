@@ -184,7 +184,7 @@ var _ simapp.App = (*WasmApp)(nil)
 // WasmApp extended ABCI application
 type WasmApp struct {
 	*baseapp.BaseApp
-	cdc *codec.Codec
+	cdc *codec.LegacyAmino
 
 	invCheckPeriod uint
 
@@ -513,8 +513,8 @@ func (app *WasmApp) BlockedAddrs() map[string]bool {
 	return blockedAddrs
 }
 
-// Codec returns the application's sealed codec.
-func (app *WasmApp) Codec() *codec.Codec {
+// LegacyAmino returns the application's sealed codec.
+func (app *WasmApp) LegacyAmino() *codec.LegacyAmino {
 	return app.cdc
 }
 

@@ -34,7 +34,7 @@ func TestGovRestHandlers(t *testing.T) {
 	clientCtx := client.Context{}.
 		WithJSONMarshaler(encodingConfig.Marshaler).
 		WithTxConfig(encodingConfig.TxConfig).
-		WithCodec(encodingConfig.Amino).
+		WithLegacyAmino(encodingConfig.Amino).
 		WithInput(os.Stdin).
 		WithAccountRetriever(authtypes.NewAccountRetriever(encodingConfig.Marshaler)).
 		WithBroadcastMode(flags.BroadcastBlock).

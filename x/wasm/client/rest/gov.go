@@ -58,7 +58,7 @@ func StoreCodeProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandler
 		SubRoute: "wasm_store_code",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
 			var req StoreCodeProposalJsonReq
-			if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 				return
 			}
 			toStdTxResponse(cliCtx, w, req)
@@ -111,7 +111,7 @@ func InstantiateProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandl
 		SubRoute: "wasm_instantiate",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
 			var req InstantiateProposalJsonReq
-			if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 				return
 			}
 			toStdTxResponse(cliCtx, w, req)
@@ -159,7 +159,7 @@ func MigrateProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandler {
 		SubRoute: "wasm_migrate",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
 			var req MigrateProposalJsonReq
-			if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 				return
 			}
 			toStdTxResponse(cliCtx, w, req)
@@ -202,7 +202,7 @@ func UpdateContractAdminProposalHandler(cliCtx client.Context) govrest.ProposalR
 		SubRoute: "wasm_update_admin",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
 			var req UpdateAdminJsonReq
-			if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 				return
 			}
 			toStdTxResponse(cliCtx, w, req)
@@ -243,7 +243,7 @@ func ClearContractAdminProposalHandler(cliCtx client.Context) govrest.ProposalRE
 		SubRoute: "wasm_clear_admin",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
 			var req ClearAdminJsonReq
-			if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 				return
 			}
 			toStdTxResponse(cliCtx, w, req)

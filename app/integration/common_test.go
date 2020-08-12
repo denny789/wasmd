@@ -41,7 +41,7 @@ func Setup(isCheckTx bool) *wasmd.WasmApp {
 	if !isCheckTx {
 		// init chain must be called to stop deliverState from being nil
 		genesisState := wasmd.NewDefaultGenesisState()
-		stateBytes, err := codec.MarshalJSONIndent(app.Codec(), genesisState)
+		stateBytes, err := codec.MarshalJSONIndent(app.LegacyAmino(), genesisState)
 		if err != nil {
 			panic(err)
 		}
@@ -68,10 +68,10 @@ func SetupWithGenesisAccounts(genAccs []authtypes.GenesisAccount) *wasmd.WasmApp
 	genesisState := wasmd.NewDefaultGenesisState()
 
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
-	genesisStateBz := app.Codec().MustMarshalJSON(authGenesis)
+	genesisStateBz := app.LegacyAmino().MustMarshalJSON(authGenesis)
 	genesisState[authtypes.ModuleName] = genesisStateBz
 
-	stateBytes, err := codec.MarshalJSONIndent(app.Codec(), genesisState)
+	stateBytes, err := codec.MarshalJSONIndent(app.LegacyAmino(), genesisState)
 	if err != nil {
 		panic(err)
 	}

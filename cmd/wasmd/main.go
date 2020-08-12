@@ -44,7 +44,7 @@ func main() {
 	initClientCtx := client.Context{}.
 		WithJSONMarshaler(encodingConfig.Marshaler).
 		WithTxConfig(encodingConfig.TxConfig).
-		WithCodec(encodingConfig.Amino).
+		WithLegacyAmino(encodingConfig.Amino).
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.NewAccountRetriever(encodingConfig.Marshaler)).
 		WithBroadcastMode(flags.BroadcastBlock).

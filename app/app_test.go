@@ -74,7 +74,7 @@ func TestGetEnabledProposals(t *testing.T) {
 
 func setGenesis(gapp *WasmApp) error {
 	genesisState := NewDefaultGenesisState()
-	stateBytes, err := codec.MarshalJSONIndent(gapp.Codec(), genesisState)
+	stateBytes, err := codec.MarshalJSONIndent(gapp.LegacyAmino(), genesisState)
 	if err != nil {
 		return err
 	}
