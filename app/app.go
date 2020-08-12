@@ -309,8 +309,6 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	)
 
 	// Create IBC Keeper
-	// TODO: remove amino codec dependency once Tendermint version is upgraded with
-	// protobuf changes
 	app.ibcKeeper = ibckeeper.NewKeeper(
 		appCodec, keys[ibchost.StoreKey], app.stakingKeeper, scopedIBCKeeper,
 	)
