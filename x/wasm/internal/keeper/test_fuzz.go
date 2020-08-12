@@ -61,8 +61,8 @@ func FuzzAccessType(m *types.AccessType, c fuzz.Continue) {
 	}
 }
 func FuzzAccessConfig(m *types.AccessConfig, c fuzz.Continue) {
-	FuzzAccessType(&m.Type, c)
+	FuzzAccessType(&m.Permission, c)
 	var add sdk.AccAddress
 	FuzzAddr(&add, c)
-	*m = m.Type.With(add)
+	*m = m.Permission.With(add)
 }

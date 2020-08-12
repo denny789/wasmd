@@ -3,7 +3,7 @@ package app
 import (
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/CosmWasm/wasmd/app"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -15,7 +15,7 @@ import (
 // This is due to secp256k1 signatures not being constant size.
 // nolint: vet
 func ExampleTxSendSize() {
-	_, cdc := simapp.MakeCodecs() // todo? why codec here again... omg.
+	cdc := app.MakeEncodingConfig().Amino
 
 	var gas uint64 = 1
 

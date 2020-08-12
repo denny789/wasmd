@@ -1,24 +1,22 @@
 package app
 
 import (
-	"github.com/magiconair/properties/assert"
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/log"
 	db "github.com/tendermint/tm-db"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/simapp"
-
 	"github.com/CosmWasm/wasmd/x/wasm"
+	"github.com/cosmos/cosmos-sdk/codec"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func TestWasmdExport(t *testing.T) {
 	db := db.NewMemDB()
-	gapp := NewWasmApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, "", 0, wasm.EnableAllProposals, wasm.EnableAllProposals)
+	gapp := NewWasmApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, "", 0, wasm.EnableAllProposals)
 	err := setGenesis(gapp)
 	require.NoError(t, err)
 
@@ -75,7 +73,7 @@ func TestGetEnabledProposals(t *testing.T) {
 }
 
 func setGenesis(gapp *WasmApp) error {
-	genesisState := simapp.NewDefaultGenesisState()
+	genesisState := NewDefaultGenesisState()
 	stateBytes, err := codec.MarshalJSONIndent(gapp.Codec(), genesisState)
 	if err != nil {
 		return err

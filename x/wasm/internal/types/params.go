@@ -32,7 +32,7 @@ func (a AccessType) With(addr sdk.AccAddress) AccessConfig {
 		if err := sdk.VerifyAddressFormat(addr); err != nil {
 			panic(err)
 		}
-		return AccessConfig{Type: AccessTypeOnlyAddress, Address: addr}
+		return AccessConfig{Permission: AccessTypeOnlyAddress, Address: addr}
 	case AccessTypeEverybody:
 		return AllowEverybody
 	}
@@ -67,13 +67,13 @@ func (a AccessType) MarshalText() ([]byte, error) {
 }
 
 func (a AccessConfig) Equals(o AccessConfig) bool {
-	return a.Type == o.Type && a.Address.Equals(o.Address)
+	return a.Permission == o.Permission && a.Address.Equals(o.Address)
 }
 
 var (
 	DefaultUploadAccess = AllowEverybody
-	AllowEverybody      = AccessConfig{Type: AccessTypeEverybody}
-	AllowNobody         = AccessConfig{Type: AccessTypeNobody}
+	AllowEverybody      = AccessConfig{Permission: AccessTypeEverybody}
+	AllowNobody         = AccessConfig{Permission: AccessTypeNobody}
 )
 
 // ParamKeyTable returns the parameter key table.
@@ -138,7 +138,7 @@ func validateAccessType(i interface{}) error {
 }
 
 func (v AccessConfig) ValidateBasic() error {
-	switch v.Type {
+	switch v.Permission {
 	case AccessTypeUndefined:
 		return sdkerrors.Wrap(ErrEmpty, "type")
 	case AccessTypeNobody, AccessTypeEverybody:
@@ -149,11 +149,11 @@ func (v AccessConfig) ValidateBasic() error {
 	case AccessTypeOnlyAddress:
 		return sdk.VerifyAddressFormat(v.Address)
 	}
-	return sdkerrors.Wrapf(ErrInvalid, "unknown type: %q", v.Type)
+	return sdkerrors.Wrapf(ErrInvalid, "unknown type: %q", v.Permission)
 }
 
 func (v AccessConfig) Allowed(actor sdk.AccAddress) bool {
-	switch v.Type {
+	switch v.Permission {
 	case AccessTypeNobody:
 		return false
 	case AccessTypeEverybody:

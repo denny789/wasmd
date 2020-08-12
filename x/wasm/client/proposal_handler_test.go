@@ -9,7 +9,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/CosmWasm/wasmd/app"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -39,7 +38,7 @@ func TestGovRestHandlers(t *testing.T) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(authtypes.NewAccountRetriever(encodingConfig.Marshaler)).
 		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(app.DefaultCLIHome).WithChainID("testing")
+		WithChainID("testing")
 
 	// router setup as in gov/client/rest/tx.go
 	propSubRtr := mux.NewRouter().PathPrefix("/gov/proposals").Subrouter()

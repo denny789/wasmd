@@ -4,7 +4,6 @@ import (
 	"github.com/CosmWasm/wasmd/x/wasm/internal/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/gov/client/cli"
@@ -75,7 +74,7 @@ func ProposalStoreCodeCmd() *cobra.Command {
 	cmd.Flags().String(cli.FlagDeposit, "", "Deposit of proposal")
 	cmd.Flags().String(cli.FlagProposal, "", "Proposal file path (if this path is given, other proposal flags are ignored)")
 	// type values must match the "ProposalHandler" "routes" in cli
-	cmd.Flags().String(flagProposalType, "", "Type of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade")
+	cmd.Flags().String(flagProposalType, "", "Permission of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade")
 	return cmd
 }
 
@@ -140,7 +139,7 @@ func ProposalInstantiateContractCmd() *cobra.Command {
 	cmd.Flags().String(cli.FlagDeposit, "", "Deposit of proposal")
 	cmd.Flags().String(cli.FlagProposal, "", "Proposal file path (if this path is given, other proposal flags are ignored)")
 	// type values must match the "ProposalHandler" "routes" in cli
-	cmd.Flags().String(flagProposalType, "", "Type of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade")
+	cmd.Flags().String(flagProposalType, "", "Permission of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade")
 	return cmd
 }
 
@@ -202,7 +201,7 @@ func ProposalMigrateContractCmd() *cobra.Command {
 	cmd.Flags().String(cli.FlagDeposit, "", "Deposit of proposal")
 	cmd.Flags().String(cli.FlagProposal, "", "Proposal file path (if this path is given, other proposal flags are ignored)")
 	// type values must match the "ProposalHandler" "routes" in cli
-	cmd.Flags().String(flagProposalType, "", "Type of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade")
+	cmd.Flags().String(flagProposalType, "", "Permission of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade")
 	return cmd
 }
 
@@ -252,7 +251,7 @@ func ProposalUpdateContractAdminCmd() *cobra.Command {
 	cmd.Flags().String(cli.FlagDeposit, "", "Deposit of proposal")
 	cmd.Flags().String(cli.FlagProposal, "", "Proposal file path (if this path is given, other proposal flags are ignored)")
 	// type values must match the "ProposalHandler" "routes" in cli
-	cmd.Flags().String(flagProposalType, "", "Type of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade")
+	cmd.Flags().String(flagProposalType, "", "Permission of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade")
 	return cmd
 }
 
@@ -301,6 +300,6 @@ func ProposalClearContractAdminCmd() *cobra.Command {
 	cmd.Flags().String(cli.FlagDeposit, "", "Deposit of proposal")
 	cmd.Flags().String(cli.FlagProposal, "", "Proposal file path (if this path is given, other proposal flags are ignored)")
 	// type values must match the "ProposalHandler" "routes" in cli
-	cmd.Flags().String(flagProposalType, "", "Type of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade")
+	cmd.Flags().String(flagProposalType, "", "Permission of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade")
 	return cmd
 }

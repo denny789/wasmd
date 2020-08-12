@@ -81,7 +81,7 @@ func TestCreateStoresInstantiatePermission(t *testing.T) {
 		},
 		"onlyAddress with matching address": {
 			srcPermission: types.AccessTypeOnlyAddress,
-			expInstConf:   types.AccessConfig{Type: types.AccessTypeOnlyAddress, Address: myAddr},
+			expInstConf:   types.AccessConfig{Permission: types.AccessTypeOnlyAddress, Address: myAddr},
 		},
 	}
 	for msg, spec := range specs {
@@ -307,7 +307,7 @@ func TestInstantiate(t *testing.T) {
 	require.Equal(t, "cosmos18vd8fpwxzck93qlwghaj6arh4p7c5n89uzcee5", contractAddr.String())
 
 	gasAfter := ctx.GasMeter().GasConsumed()
-	require.Equal(t, uint64(0x11848), gasAfter-gasBefore)
+	require.Equal(t, uint64(0x10ec2), gasAfter-gasBefore)
 
 	// ensure it is stored properly
 	info := keeper.GetContractInfo(ctx, contractAddr)
@@ -322,7 +322,7 @@ func TestInstantiate(t *testing.T) {
 		Updated:   types.NewAbsoluteTxPosition(ctx),
 		Msg:       json.RawMessage(initMsgBz),
 	}}
-	assert.Equal(t, exp, keeper.GetContractHistory(ctx, contractAddr))
+	assert.Equal(t, exp, keeper.GetContractHistory(ctx, contractAddr).CodeHistoryEntries)
 }
 
 func TestInstantiateWithDeposit(t *testing.T) {
@@ -535,7 +535,7 @@ func TestExecute(t *testing.T) {
 
 	// make sure gas is properly deducted from ctx
 	gasAfter := ctx.GasMeter().GasConsumed()
-	require.Equal(t, uint64(0x11b4e), gasAfter-gasBefore)
+	require.Equal(t, uint64(0x1192e), gasAfter-gasBefore)
 
 	// ensure bob now exists and got both payments released
 	bobAcct = accKeeper.GetAccount(ctx, bob)
@@ -904,7 +904,7 @@ func TestMigrate(t *testing.T) {
 				Updated:   types.NewAbsoluteTxPosition(ctx),
 				Msg:       spec.migrateMsg,
 			}}
-			assert.Equal(t, expHistory, keeper.GetContractHistory(ctx, contractAddr))
+			assert.Equal(t, expHistory, keeper.GetContractHistory(ctx, contractAddr).CodeHistoryEntries)
 
 			m := keeper.QueryRaw(ctx, contractAddr, []byte("config"))
 			require.Len(t, m, 1)

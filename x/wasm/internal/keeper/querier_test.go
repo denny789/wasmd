@@ -358,6 +358,10 @@ func TestQueryCodeList(t *testing.T) {
 
 			// then
 			require.NoError(t, err)
+			if len(spec.codeIDs) == 0 {
+				require.Nil(t, resData)
+				return
+			}
 
 			var got []map[string]interface{}
 			err = json.Unmarshal(resData, &got)

@@ -483,7 +483,7 @@ func (app *WasmApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.R
 
 // InitChainer application update at chain initialization
 func (app *WasmApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	var genesisState simapp.GenesisState
+	var genesisState GenesisState
 	app.cdc.MustUnmarshalJSON(req.AppStateBytes, &genesisState)
 	return app.mm.InitGenesis(ctx, app.cdc, genesisState)
 }

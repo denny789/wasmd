@@ -49,7 +49,7 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=wasm \
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=wasmd \
-		  -X github.com/cosmos/cosmos-sdk/version.ClientName=wasmcli \
+		  -X github.com/CosmWasm/wasmd/cmd/wasmcli/version.ClientName=wasmcli \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
@@ -62,7 +62,7 @@ ldflags := $(strip $(ldflags))
 
 coral_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=coral \
 				  -X github.com/cosmos/cosmos-sdk/version.AppName=corald \
-				  -X github.com/cosmos/cosmos-sdk/version.ClientName=coral \
+				  -X github.com/CosmWasm/wasmd/cmd/wasmcli/version.ClientName=coral \
 				  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 				  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 				  -X github.com/CosmWasm/wasmd/app.CLIDir=.coral \
@@ -77,7 +77,7 @@ coral_ldflags := $(strip $(coral_ldflags))
 
 flex_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=gaiaflex \
 				  -X github.com/cosmos/cosmos-sdk/version.AppName=gaiaflexd \
-				  -X github.com/cosmos/cosmos-sdk/version.ClientName=gaiaflex \
+				  -X github.com/CosmWasm/wasmd/cmd/wasmcli/version.ClientName=gaiaflex \
 				  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 				  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 				  -X github.com/CosmWasm/wasmd/app.ProposalsEnabled=true \
@@ -89,9 +89,9 @@ flex_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=gaiaflex \
 flex_ldflags += $(LDFLAGS)
 flex_ldflags := $(strip $(flex_ldflags))
 
-BUILD_FLAGS := -tags $(build_tags) -ldflags '$(ldflags)' -trimpath
-CORAL_BUILD_FLAGS := -tags $(build_tags) -ldflags '$(coral_ldflags)' -trimpath
-FLEX_BUILD_FLAGS := -tags $(build_tags) -ldflags '$(flex_ldflags)' -trimpath
+BUILD_FLAGS := -tags $(build_tags_comma_sep) -ldflags '$(ldflags)' -trimpath
+CORAL_BUILD_FLAGS := -tags $(build_tags_comma_sep) -ldflags '$(coral_ldflags)' -trimpath
+FLEX_BUILD_FLAGS := -tags $(build_tags_comma_sep) -ldflags '$(flex_ldflags)' -trimpath
 
 all: install lint test
 
@@ -150,7 +150,7 @@ go.sum: go.mod
 draw-deps:
 	@# requires brew install graphviz or apt-get install graphviz
 	go get github.com/RobotsAndPencils/goviz
-	@goviz -i ./cmd/gaiad -d 2 | dot -Tpng -o dependency-graph.png
+	@goviz -i ./cmd/wasmd -d 2 | dot -Tpng -o dependency-graph.png
 
 clean:
 	rm -rf snapcraft-local.yaml build/
@@ -158,12 +158,11 @@ clean:
 distclean: clean
 	rm -rf vendor/
 
-###############################################################################
-###                           Tests & Simulation                            ###
-###############################################################################
+########################################
+### Testing
 
-test: test-unit test-build
 
+test: test-unit
 test-all: check test-race test-cover
 
 test-unit:
@@ -175,8 +174,6 @@ test-race:
 test-cover:
 	@go test -mod=readonly -timeout 30m -race -coverprofile=coverage.txt -covermode=atomic -tags='ledger test_ledger_mock' ./...
 
-test-build: build
-	@go test -mod=readonly -p 4 `go list ./cli_test/...` -tags=cli_test -v
 
 benchmark:
 	@go test -mod=readonly -bench=. ./...

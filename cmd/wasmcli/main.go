@@ -21,6 +21,9 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 )
 
+// ClientName is set via build process
+const ClientName = "wasmcli"
+
 func main() {
 	// Configure cobra to sort commands
 	cobra.EnableCommandSorting = false
@@ -48,8 +51,8 @@ func main() {
 		WithHomeDir(app.DefaultCLIHome)
 
 	rootCmd := &cobra.Command{
-		Use:   version.ClientName,
-		Short: "Command line interface for interacting with " + version.ServerName,
+		Use:   ClientName,
+		Short: "Command line interface for interacting with " + version.AppName,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err

@@ -18,8 +18,8 @@ enum AccessType {
 
 message AccessConfig {
     option (gogoproto.goproto_stringer) = true;
-    AccessType type = 1;
-    bytes address = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    AccessType permission = 1 [(gogoproto.moretags) = "yaml:\"permission\""];
+    bytes address = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "yaml:\"address\""];
 }
 // Params defines the set of wasm parameters.
 message Params {

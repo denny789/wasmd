@@ -154,6 +154,11 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 		authtypes.ProtoBaseAccount, // prototype
 		maccPerms,
 	)
+	blockedAddrs := make(map[string]bool)
+	for acc := range maccPerms {
+		allowReceivingFunds := acc != distributiontypes.ModuleName
+		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = allowReceivingFunds
+	}
 
 	bankSubsp, _ := paramsKeeper.GetSubspace(banktypes.ModuleName)
 	bankKeeper := bankkeeper.NewBaseKeeper(
@@ -161,7 +166,7 @@ func CreateTestInput(t *testing.T, isCheckTx bool, tempDir string, supportedFeat
 		keyBank,
 		authKeeper,
 		bankSubsp,
-		nil,
+		blockedAddrs,
 	)
 	bankParams := banktypes.DefaultParams()
 	bankParams = bankParams.SetSendEnabledParam("stake", true)
